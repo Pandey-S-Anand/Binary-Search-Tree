@@ -13,7 +13,7 @@
  * }
  * }
  */
- 
+
 /**
  * ✅ Valid BST and ❌ Invalid BST Example:
  * 
@@ -42,6 +42,10 @@
  * - Right subtree (8, 7, 10) satisfies BST property (7 < 8 < 10).
  */ 
 
+//Recursive approach
+
+//Method 1
+
 class Solution {
     public boolean isValidBST(TreeNode root) {
         // Call the helper function with the full valid range of a BST (-∞ to +∞)
@@ -65,5 +69,182 @@ class Solution {
          * 2. Right subtree: Valid range is updated to (root.val, high)
          */
         return isValidBST(root.left, low, root.val) && isValidBST(root.right, root.val, high);
+    }
+}
+
+//Method 2
+
+//Naive implementation
+
+class Solution {
+    private List<Integer> inorder;
+
+    public boolean isValidBST(TreeNode root) {
+        inorder = new ArrayList<>();
+        /*
+         * Since inorder traversal follows (L -> Root -> R), it naturally visits nodes in increasing order.
+         * For a Binary Search Tree (BST), the inorder traversal will always produce elements in strictly increasing order.
+         * If the inorder list is not strictly increasing, the tree is not a valid BST.
+         */
+        inorderTraversal(root);
+        return isStrictlyIncreasing();
+    }
+
+    private void inorderTraversal(TreeNode root) {
+        if (root == null) {
+            return;
+        }
+
+        inorderTraversal(root.left);
+        inorder.add(root.val);
+        inorderTraversal(root.right);
+    }
+
+    private boolean isStrictlyIncreasing() {
+        for (int i = 1; i < inorder.size(); i++) {
+            if (inorder.get(i - 1) >= inorder.get(i)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+}
+
+
+//Optimal implementation
+
+class Solution {
+    private TreeNode previous; // Stores the previous node in inorder traversal
+
+    public boolean isValidBST(TreeNode root) {
+        previous = null; // Initialize previous node as null
+        return inorderTraversal(root);
+    }
+
+    private boolean inorderTraversal(TreeNode root) {
+        if (root == null) {
+            return true;
+        }
+
+        if (!inorderTraversal(root.left)) {
+            return false;
+        }
+
+        // Check if the current node violates the BST property
+        if (previous != null && previous.val >= root.val) {
+            return false;
+        }
+        previous = root; // Update previous node
+        
+        return inorderTraversal(root.right);
+    }
+}
+
+
+//Iterative approach
+
+//Naive approach
+
+class Solution {
+    public boolean isValidBST(TreeNode root) {
+        if (root == null) {
+            return true;
+        }
+
+        Deque<TreeNode> stack = new ArrayDeque<>();
+
+        // Start with the root of the tree
+        TreeNode current = root;
+        TreeNode previous = null; // Is used to keep track of the last node visited in the inorder traversal.
+
+        while (current != null || !stack.isEmpty()) {
+            // Reach the leftmost node (push all left nodes onto the stack)
+            while (current != null) {
+                stack.push(current);
+                current = current.left;
+            }
+
+            // Pop the top node from the stack, this is the node that should be visited
+            current = stack.pop();
+            // Storing the value of the current node is not necessary, as we are not maintaining the inorder traversal list.
+
+            // Check if the current node's value is greater than the previous node's value If not, the tree is not a valid BST
+            if (previous != null && previous.val >= current.val) {
+                return false; // BST property violated
+            }
+
+            previous = current; // Update the previous node
+
+            // Move to the right child of the current node
+            current = current.right;
+        }
+
+        return true;
+    }
+}
+
+
+//Optimal approach
+
+class Solution {
+    public boolean isValidBST(TreeNode root) {
+        if (root == null) {
+            return true;
+        }
+
+        TreeNode current = root;
+        TreeNode previous = null;
+
+        while (current != null) {
+            // Case 1: If there is no left subtree, process the node and move right
+            if (current.left == null) {
+                // Check if the current node follows the BST property
+                if (previous != null && previous.val >= current.val) {
+                    return false; // BST property violated
+                }
+                previous = current; // Update previous node
+                current = current.right; // Move to the right subtree
+            } else {
+                // Case 2: If left subtree exists, find the rightmost node in the left subtree
+                TreeNode rightmost = current.left;
+
+                // Move to the rightmost node in the left subtree
+                /*
+                 * rightmost.right != current condition is detecting the temporary link
+                 * If rightmost.right is already pointing to current, we need to revert the
+                 * changes we made.
+                 */
+                while (rightmost.right != null && rightmost.right != current) {
+                    rightmost = rightmost.right;
+                }
+
+                if (rightmost.right == current) {
+                    /*
+                     * This condition indicates that we have finished processing the left subtree.
+                     * - We don't need to add the current node value to a inorder traversal list 
+                     *   because we only care about the BST property, which is verified during traversal. 
+                     * - We remove the temporary link (thread) between the rightmost node of the left subtree
+                     *   and the current node (this restores the original tree structure).
+                     * - Finally, we move to the right subtree to continue the traversal.
+                     */
+
+                    // Check if the current node follows the BST property
+                    if (previous != null && previous.val >= current.val) {
+                        return false; // BST property violated
+                    }
+                    previous = current; // Update previous node
+
+                    rightmost.right = null; // Revert the temporary link (remove the thread)
+                    current = current.right; // Move to the right subtree
+                } else {
+                    // Create a temporary thread from the rightmost node to the current node
+                    rightmost.right = current;
+                    current = current.left; // Move to the left subtree
+                }
+            }
+        }
+
+        return true;
     }
 }
