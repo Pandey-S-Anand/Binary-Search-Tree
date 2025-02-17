@@ -1,0 +1,69 @@
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ * int val;
+ * TreeNode left;
+ * TreeNode right;
+ * TreeNode() {}
+ * TreeNode(int val) { this.val = val; }
+ * TreeNode(int val, TreeNode left, TreeNode right) {
+ * this.val = val;
+ * this.left = left;
+ * this.right = right;
+ * }
+ * }
+ */
+ 
+/**
+ * ✅ Valid BST and ❌ Invalid BST Example:
+ * 
+ * ❌ Invalid BST Example:
+ * 
+ *        5
+ *       / \
+ *      4   6
+ *         / \
+ *        3   7
+ * 
+ * This is NOT a valid BST because:
+ * - The node 3 is in the right subtree of 5.
+ * - But 3 < 5, which violates the BST rule.
+ *
+ * ✅ Valid BST Example:
+ * 
+ *        5
+ *       / \
+ *      3   8
+ *     / \  / \
+ *    2   4 7  10
+ * 
+ * This is a valid BST because:
+ * - Left subtree (3, 2, 4) satisfies BST property (2 < 3 < 4).
+ * - Right subtree (8, 7, 10) satisfies BST property (7 < 8 < 10).
+ */ 
+
+class Solution {
+    public boolean isValidBST(TreeNode root) {
+        // Call the helper function with the full valid range of a BST (-∞ to +∞)
+        return isValidBST(root, Long.MIN_VALUE, Long.MAX_VALUE);
+    }
+
+    private boolean isValidBST(TreeNode root, long low, long high) {
+        // Base Case: If we reach a null node, it means all previous nodes followed BST rules.
+        if (root == null) {
+            return true;
+        }
+
+        // If the current node value is outside the valid range, it's not a BST.
+        if (!(root.val > low && root.val < high)) {
+            return false;
+        }
+
+        /*
+         * Recursively check:
+         * 1. Left subtree: Valid range is updated to (low, root.val)
+         * 2. Right subtree: Valid range is updated to (root.val, high)
+         */
+        return isValidBST(root.left, low, root.val) && isValidBST(root.right, root.val, high);
+    }
+}
