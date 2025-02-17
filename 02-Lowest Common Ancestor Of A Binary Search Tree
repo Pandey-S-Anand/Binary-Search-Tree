@@ -56,7 +56,7 @@ class Solution {
 }
 
 
-//Improved approach
+//Better approach
 
 class Solution {
     public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
