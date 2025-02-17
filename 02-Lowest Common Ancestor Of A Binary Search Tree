@@ -123,10 +123,6 @@ class Solution {
          * the non-null value that is propagated upward (node 5) correctly serves as the LCA.
          */
 
-        /*
-        
-         */
-
         if (left != null) {
             return left;
         }
@@ -140,4 +136,49 @@ class Solution {
     }
 }
 
-//Optimal approach
+//Optimal approach (These approaches assume that both p and q are guaranteed to exist in the tree, as we are not explicitly checking for their presence.)
+
+//Recursive approach
+
+class Solution {
+    public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
+        // Base case: If the root is null, return null
+        if (root == null) {
+            return null;
+        }
+
+        // If both p and q have values smaller than root, the LCA must be in the left subtree
+        if (p.val < root.val && q.val < root.val) {
+            return lowestCommonAncestor(root.left, p, q);
+        }
+
+        // If both p and q have values greater than root, the LCA must be in the right subtree
+        if (p.val > root.val && q.val > root.val) {
+            return lowestCommonAncestor(root.right, p, q);
+        }
+
+        //If one node is on the left and the other is on the right, or one of them is the root, the current node is the LCA.
+        return root;
+    }
+}
+
+
+//Iterative approach
+
+class Solution {
+    public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
+        while (root != null) {
+            if (p.val < root.val && q.val < root.val) {
+                // If both p and q have values smaller than root, the LCA must be in the left subtree
+                root = root.left;
+            } else if (p.val > root.val && q.val > root.val) {
+                // If both p and q have values greater than root, the LCA must be in the left subtree
+                root = root.right;
+            } else { 
+                // If one is smaller and the other is larger than root, or one of them is equal to root, this is the LCA
+                return root;
+            }
+        }
+        return null; // Return null if no LCA is found, although this case is unlikely since p and q are guaranteed to exist in the tree and the tree is a valid BST.
+    }
+}
