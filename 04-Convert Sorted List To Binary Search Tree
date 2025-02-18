@@ -1,0 +1,114 @@
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode() {}
+ *     ListNode(int val) { this.val = val; }
+ *     ListNode(int val, ListNode next) { this.val = val; this.next = next; }
+ * }
+ */
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ * int val;
+ * TreeNode left;
+ * TreeNode right;
+ * TreeNode() {}
+ * TreeNode(int val) { this.val = val; }
+ * TreeNode(int val, TreeNode left, TreeNode right) {
+ * this.val = val;
+ * this.left = left;
+ * this.right = right;
+ * }
+ * }
+ */
+
+//Bruteforce approach
+
+class Solution {
+    public TreeNode sortedListToBST(ListNode head) {
+        List<Integer> arr = new ArrayList<>();
+        ListNode currentNode = head;
+
+        while (currentNode != null) {
+            arr.add(currentNode.val);
+            currentNode = currentNode.next;
+        }
+        
+        // Start the recursive function with the full range of the array
+        return sortedListToBST(arr, 0, arr.size() - 1);
+    }
+
+    private TreeNode sortedListToBST(List<Integer> arr, int low, int high) {
+        // Base case: If the low index exceeds the high index, return null (no node to create)
+        if (low > high) {
+            return null;
+        }
+
+        // Find the middle element to make it the root of the subtree
+        int mid = low + (high - low) / 2;
+        TreeNode node = new TreeNode(arr.get(mid)); // Create a new node with the middle element
+
+        // Recursively construct the left subtree using the left half of the list
+        node.left = sortedListToBST(arr, low, mid - 1);
+
+        // Recursively construct the right subtree using the right half of the list
+        node.right = sortedListToBST(arr, mid + 1, high);
+
+        // Return the root node of the subtree
+        return node;
+    }
+}
+
+
+//Optimal approach
+
+class Solution {
+    public TreeNode sortedListToBST(ListNode head) {
+        // Base case: if the list is empty, return null.
+        if (head == null) {
+            return null;
+        }
+
+        // Base case: if there's only one element, it becomes a leaf node.
+        if (head.next == null) {
+            return new TreeNode(head.val);
+        }
+
+        // Split the list and extract the middle node.
+        ListNode midNode = splitAndExtractMiddle(head);
+
+        // Create a new tree node with the middle node's value.
+        TreeNode root = new TreeNode(midNode.val);
+
+        // Recursively construct the left subtree using the left half of the list.
+        root.left = sortedListToBST(head);
+
+        // Recursively construct the right subtree using the right half of the list.
+        root.right = sortedListToBST(midNode.next);
+
+        return root;
+    }
+
+    private ListNode splitAndExtractMiddle(ListNode head) {
+        ListNode preMiddle = null; // Pointer to track the node before the middle.
+        ListNode slow = head;
+        ListNode fast = head;      
+
+        while (fast != null && fast.next != null) {
+            preMiddle = slow;
+            slow = slow.next;
+            fast = fast.next.next;
+        }
+
+        /*
+         * Detach the left half of the list from the middle node.
+         * Since this method is only called for lists with at least two nodes, preMiddle
+         * is not null.
+         */
+        preMiddle.next = null;
+
+        return slow;
+    }
+}
