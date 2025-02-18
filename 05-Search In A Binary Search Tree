@@ -1,0 +1,21 @@
+class Solution {
+    public TreeNode searchBST(TreeNode root, int target) {
+        // Base case: if the root is null, the tree is empty or the node is not found.
+        if (root == null) {
+            return null;
+        }
+
+        // If the current node's value matches the target, return the node.
+        if (root.val == target) {
+            return root;
+        }
+
+        // If the target value is smaller than the current node's value, search in the left subtree.
+        if (target < root.val) {
+            return searchBST(root.left, target);
+        }
+
+        // If the target value is greater than the current node's value, search in the right subtree .
+        return searchBST(root.right, target);
+    }
+}
