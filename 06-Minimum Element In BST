@@ -1,0 +1,72 @@
+//Naive approach
+
+class Solution {
+    // Variable to store the minimum value found in the tree
+    private int minimum;
+
+    int minValue(Node root) {
+        // Initialize minimum with - 1
+        minimum = -1; // Given constraint: 0 <= node->data <= 10^5
+
+        // Start the recursive traversal to find the minimum value
+        findMinValue(root);
+
+        return minimum;
+    }
+
+    private void findMinValue(Node root) {
+        // Base case: If the node is null, return 
+        if (root == null) {
+            return;
+        }
+
+        // Update minimum if the current node's value is smaller
+        minimum = Math.min(minimum, root.data);
+
+        // Recursively check the left and right subtrees
+        findMinValue(root.left);
+        findMinValue(root.right);
+    }
+}
+
+
+//Optimal approach
+
+//Recursive approach
+
+class Solution {
+    int minValue(Node root) {
+        // Base case: If root is null, return -1 (Invalid value)
+        if (root == null) {
+            return -1;
+        }
+
+        // If there's no left child, return the current node's value
+        if (root.left == null) {
+            return root.data;
+        }
+
+        // Recur for the left subtree to find the minimum value
+        return minValue(root.left);
+    }
+}
+
+
+//Iterative approach
+
+class Solution {
+    int minValue(Node root) {
+        // If the tree is empty, return -1 (or any appropriate value)
+        if (root == null) {
+            return -1;
+        }
+
+        // Traverse to the leftmost node
+        while (root.left != null) {
+            root = root.left;
+        }
+
+        // The leftmost node contains the minimum value
+        return root.data;
+    }
+}
