@@ -1,0 +1,44 @@
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ * int val;
+ * TreeNode left;
+ * TreeNode right;
+ * TreeNode() {}
+ * TreeNode(int val) { this.val = val; }
+ * TreeNode(int val, TreeNode left, TreeNode right) {
+ * this.val = val;
+ * this.left = left;
+ * this.right = right;
+ * }
+ * }
+ */
+
+class Solution {
+    // Index to track the current position in the preorder array
+    private int index = 0;
+
+    public TreeNode bstFromPreorder(int[] preorder) {
+        // Call the helper function with the full valid range of BST values
+        return bstFromPreorder(preorder, Integer.MIN_VALUE, Integer.MAX_VALUE);
+    }
+
+    private TreeNode bstFromPreorder(int[] preorder, int min, int max) {
+        // Base case: If all elements are processed or the current value is out of range, return null
+        if (index == preorder.length || preorder[index] < min || preorder[index] > max) {
+            return null;
+        }
+
+        // Get the current value and move to the next element
+        int value = preorder[index++];
+        TreeNode root = new TreeNode(value);
+
+        // Recursively construct the left subtree with an updated max boundary
+        root.left = bstFromPreorder(preorder, min, value);
+
+        // Recursively construct the right subtree with an updated min boundary
+        root.right = bstFromPreorder(preorder, value, max);
+
+        return root; // Return the constructed subtree
+    }
+}
