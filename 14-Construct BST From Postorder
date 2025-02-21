@@ -1,0 +1,33 @@
+class GFG {
+    // Static index to keep track of the current node in postorder traversal
+    private static int index;
+
+    public static Node constructTree(int postorder[], int n) {
+        // Initialize index to point to the last element (root of BST in postorder)
+        index = n - 1;
+        // Call helper function with initial range of values
+        return constructTree(postorder, Integer.MIN_VALUE, Integer.MAX_VALUE);
+    }
+    
+    private static Node constructTree(int postorder[], int min, int max) {
+        // Base condition: if index is out of bounds or current value is not in the valid range
+        if (index < 0 || postorder[index] < min || postorder[index] > max) {
+            return null; 
+        }
+        
+        // Fetch the current value from postorder and decrement index
+        int value = postorder[index--];
+        
+        // Create a new node with this value
+        Node node = new Node(value);
+        
+        // Construct the right subtree before the left subtree because postorder traversal is: Left -> Right -> Root
+        node.right = constructTree(postorder, value, max);
+        
+        // Construct the left subtree
+        node.left = constructTree(postorder, min, value);
+        
+        // Return the constructed node
+        return node;
+    }
+}
