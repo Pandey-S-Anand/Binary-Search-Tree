@@ -1,0 +1,199 @@
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ * int val;
+ * TreeNode left;
+ * TreeNode right;
+ * TreeNode() {}
+ * TreeNode(int val) { this.val = val; }
+ * TreeNode(int val, TreeNode left, TreeNode right) {
+ * this.val = val;
+ * this.left = left;
+ * this.right = right;
+ * }
+ * }
+ */
+
+//Bruteforce approach
+ 
+class Solution {
+    public int kthSmallest(TreeNode root, int k) {
+        List<Integer> inorderTraversal = new ArrayList<>();
+         
+        // Perform in-order traversal (which yields elements in sorted order for a BST)
+        findInorderTraversal(root, inorderTraversal);
+
+        // The k-th smallest element is at index (k - 1) in the sorted list.
+        return inorderTraversal.get(k - 1);
+    }
+
+    private void findInorderTraversal(TreeNode root, List<Integer> inorderTraversal) {
+        if (root == null) {
+            return;
+        }
+
+        findInorderTraversal(root.left, inorderTraversal);
+
+        inorderTraversal.add(root.val);
+
+        findInorderTraversal(root.right, inorderTraversal);
+    }
+}
+
+
+//Better approach
+
+class Solution {
+    private int count; // Counter to track the k-th smallest element
+    private int kthSmallest; // Stores the k-th smallest element
+
+    public int kthSmallest(TreeNode root, int k) {
+        count = k; // Initialize counter with k
+        kthSmallest = -1; // Default value in case the BST is empty or k is invalid
+        kthSmallestHelper(root); // Start the in-order traversal
+        return kthSmallest; // Return the k-th smallest element
+    }
+
+    private void kthSmallestHelper(TreeNode root) {
+        if (root == null) {
+            return; // Base case: return if node is null
+        }
+
+        // Recursive call to left subtree (smaller values)
+        kthSmallestHelper(root.left);
+
+        // Process the current node
+        count--; // Decrement k
+        if (count == 0) { // If k elements are visited, we found our answer
+            kthSmallest = root.val;
+            return; // Stop further recursion
+        }
+
+        // Recursive call to right subtree (larger values)
+        kthSmallestHelper(root.right);
+    }
+}
+
+
+//Aliter
+
+class Solution {
+    public int kthSmallest(TreeNode root, int k) {
+        int[] kthSmallest = { -1 };
+        kthSmallestHelper(root, new int[] { k }, kthSmallest);
+        return kthSmallest[0];
+    }
+
+    private void kthSmallestHelper(TreeNode root, int[] count, int[] kthSmallest) {
+        if (root == null) {
+            return;
+        }
+
+        kthSmallestHelper(root.left, count, kthSmallest);
+
+        count[0]--;
+        if (count[0] == 0) {
+            kthSmallest[0] = root.val;
+            return;
+        }
+
+        kthSmallestHelper(root.right, count, kthSmallest);
+    }
+}
+
+
+//Optimal approach
+
+//With modification of the original tree structure
+
+class Solution {
+    public int kthSmallest(TreeNode root, int k) {
+        TreeNode current = root;
+
+        while (current != null) {
+            // Case 1: If there is no left subtree, process the node and move right
+            if (current.left == null) {
+                // Process the current node by decrementing k
+                k--; 
+                if (k == 0) { // If k elements are visited, we found the k-th smallest
+                    return current.val;
+                }
+            
+                current = current.right; // Move to the right subtree
+            } else {
+                // Case 2: If left subtree exists, find the rightmost node in the left subtree
+                TreeNode rightmost = current.left;
+
+                // Move to the rightmost node in the left subtree
+                while (rightmost.right != null) {
+                    rightmost = rightmost.right;
+                }
+
+                // Create a temporary thread from the rightmost node to the current node
+                rightmost.right = current;
+                TreeNode temp = current; // Store current node reference
+                current = current.left; // Move current to its left subtree
+
+                // Remove the left link to avoid infinite loops
+                temp.left = null;
+            }
+        }
+
+        return -1; // This line should not be reached
+    }
+}
+
+
+//Without modification of the original tree structure
+
+class Solution {
+    public int kthSmallest(TreeNode root, int k) {
+        TreeNode current = root;
+
+        while (current != null) {
+            // Case 1: If there is no left subtree, process the node and move right
+            if (current.left == null) {
+                k--; // Decrease k because we are processing one node
+                if (k == 0) {
+                    return current.val; // If k reaches 0, return the current node value
+                }
+                current = current.right; // Move to the right subtree
+            } else {
+                // Case 2: If left subtree exists, find the rightmost node in the left subtree
+                TreeNode rightmost = current.left;
+
+                // Move to the rightmost node in the left subtree
+                /*
+                 * rightmost.right != current condition is detecting the temporary link
+                 * If rightmost.right is already pointing to current, we need to revert the changes we made.
+                 */
+                while (rightmost.right != null && rightmost.right != current) {
+                    rightmost = rightmost.right;
+                }
+
+                if (rightmost.right == current) {
+                    /*
+                     * This condition indicates that we have finished processing the left subtree.
+                     * Now, we process the current node:
+                     * 1. Decrease k.
+                     * 2. If k is 0, we have found our k-th smallest node and return its value.
+                     * 3. Revert the temporary link (thread) created earlier.
+                     * 4. Move to the right subtree
+                     */
+                    k--;
+                    if(k==0){
+                       return current.val;
+                    }
+                    rightmost.right = null; // Revert the temporary link (remove the thread)
+                    current = current.right; // Move to the right subtree
+                } else {
+                    // Create a temporary thread from the rightmost node to the current node
+                    rightmost.right = current;
+                    current = current.left; // Move to the left subtree
+                }
+            }
+        }
+
+        return -1; // This line should never be reached.
+    }
+}
