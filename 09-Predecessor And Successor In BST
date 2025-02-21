@@ -1,0 +1,197 @@
+/*
+ * To find the inorder predecessor and successor of a node, the idea is to traverse the BST while tracking potential 
+ * predecessor and successor candidates. Once the target node is found:
+ *
+ * - The inorder predecessor is determined as follows:
+ *      a) If the target node has a left subtree, the predecessor is the rightmost node in that subtree.
+ *      b) Otherwise, it is the last node encountered that is smaller than the target's value.
+ *
+ * - The inorder successor is determined as follows:
+ *      a) If the target node has a right subtree, the successor is the leftmost node in that subtree.
+ *      b) Otherwise, it is the last node encountered that is larger than the target's value.
+ *
+ * The inorder predecessor (left → root → right) is the previous node of the given node in the inorder traversal 
+ * of the BST. Similarly, the inorder successor is the next node of the given node in the inorder traversal.
+ *
+ * **Important Note:**
+ * The inorder traversal of a Binary Search Tree (BST) always produces a sorted sequence in **ascending order**.
+ * This means that:
+ * - The inorder predecessor of a node is the largest value smaller than the node.
+ * - The inorder successor of a node is the smallest value larger than the node.
+ *
+ * Example BST:
+ *
+ *               50
+ *             /    \
+ *           30      70
+ *          /  \    /  \
+ *        20   40  60   80
+ *       /         / \
+ *     10        55  65
+ *
+ * For instance, if we search for the key 60:
+ * - The inorder predecessor would be 55 (rightmost node of the left subtree of 60).
+ * - The inorder successor would be 65 (leftmost node of the right subtree of 60).
+ *
+ * Similarly, if we search for the key 55:
+ * - Inorder Predecessor of 55: 50
+ * - Inorder Successor of 55: 60
+ *
+ */
+
+//Bruteforce approach
+
+class Solution {
+    public static void findPreSuc(Node root, Node[] pre, Node[] suc, int key) {
+        List<Node> inorderTraversal = new ArrayList<>();
+        
+        //Find the inorderTraversal
+        findInorderTraversal(root, inorderTraversal);
+
+        // Perform binary search on the sorted list, as the inorder traversal of a BST always results in a strictly ascending order, to find the predecessor and successor of the key.
+        findPredecessorSuccessor(inorderTraversal, key, pre, suc);
+    }
+
+    private static void findInorderTraversal(Node root, List<Node> inorderTraversal) {
+        if (root == null) { 
+            return;
+        }
+        
+        findInorderTraversal(root.left, inorderTraversal);
+        
+        inorderTraversal.add(root);
+        
+        findInorderTraversal(root.right, inorderTraversal);
+    }
+
+
+    private static void findPredecessorSuccessor(List<Node> arr, int key, Node[] inorderPredecessor, Node[] inorderSuccessor) {
+        int low = 0, high = arr.size() - 1;
+        
+        while (low <= high) {
+            int mid = low + (high - low) / 2;
+
+            // Check if the key is found at the mid index.
+            if (arr.get(mid).data == key) {
+                // If the key is found, check for predecessor and successor.
+                
+                // If the predecessor exists (i.e., there is an element before the current element).
+                if (mid - 1 >= 0) { 
+                    inorderPredecessor[0] = arr.get(mid - 1); // The predecessor is the element before the mid element.
+                }
+                
+                // If the successor exists (i.e., there is an element after the current element).
+                if (mid + 1 < arr.size()) { 
+                    inorderSuccessor[0] = arr.get(mid + 1); // The successor is the element after the mid element.
+                }
+                
+                // Return as we've found the key and its predecessor and successor.
+                return;
+            }
+
+            // If the key is smaller than the element at mid, then the mid element is a potential successor, 
+            if (key < arr.get(mid).data) {
+                inorderSuccessor[0] = arr.get(mid);  // Set the current mid element as a possible successor.
+                high = mid - 1;  // Narrow the search to the left half of the list.
+            } else {  // If the key is greater than the element at mid, then the mid element is a potential predecessor, 
+                inorderPredecessor[0] = arr.get(mid);  // Set the current mid element as a possible predecessor.
+                low = mid + 1;  // Narrow the search to the right half of the list.
+            }
+        }
+    }
+}
+
+
+//Better approach
+
+class Solution {
+    /**
+     * @param inorderPredecessor An array where inorderPredecessor[0] will store the predecessor.
+     * @param inorderSuccessor   An array where inorderSuccessor[0] will store the successor.
+     */
+    public static void findPreSuc(Node root, Node[] inorderPredecessor, Node[] inorderSuccessor, int key) {
+        // Base case: If the root is null, simply return.
+        if (root == null) {
+            return;
+        }
+
+        // If the key is smaller than the current node, move to the left subtree.
+        if (key < root.data) {
+            // The current node is a potential successor.
+            inorderSuccessor[0] = root;
+            findPreSuc(root.left, inorderPredecessor, inorderSuccessor, key);
+            return;
+        }
+
+        // If the key is greater than the current node, move to the right subtree.
+        if (key > root.data) {
+            // The current node is a potential predecessor.
+            inorderPredecessor[0] = root;
+            findPreSuc(root.right, inorderPredecessor, inorderSuccessor, key);
+            return;
+        }
+
+        // If the key is found at the current node.
+        
+        // Find the inorder predecessor: The rightmost node in the left subtree (if exists).
+        if (root.left != null) {
+            Node node = root.left;
+            while (node.right != null) {
+                node = node.right;
+            }
+            inorderPredecessor[0] = node;
+        }
+
+        // Find the inorder successor: The leftmost node in the right subtree (if exists).
+        if (root.right != null) {
+            Node node = root.right;
+            while (node.left != null) {
+                node = node.left;
+            }
+            inorderSuccessor[0] = node;
+        }
+    }
+}
+
+
+//Optimal approach
+
+class Solution {
+    public static void findPreSuc(Node root, Node[] inorderPredecessor, Node[] inorderSuccessor, int key) {
+        while (root != null) {
+            // If the current node is the key we are searching for
+            if (root.data == key) {
+                
+                // If the node has a left child, find the rightmost node in the left subtree. This will be the inorder predecessor (largest node in the left subtree).
+                if (root.left != null) {
+                    Node node = root.left;   
+                    while (node.right != null) {
+                        node = node.right;  // Traverse right until the rightmost node.
+                    }
+                    inorderPredecessor[0] = node;  // Set the predecessor to the rightmost node in the left subtree.
+                }
+                
+                // If the node has a right child, find the leftmost node in the right subtree. This will be the inorder successor (smallest node in the right subtree).
+                if (root.right != null) {
+                    Node node = root.right;   
+                    while (node.left != null) {
+                        node = node.left;  // Traverse left until the leftmost node.
+                    }
+                    inorderSuccessor[0] = node;  // Set the successor to the leftmost node in the right subtree.
+                }
+            
+                // Return once the predecessor and successor are found.
+                return;
+            }
+
+            // If the key is smaller than the current node, the successor could be the current node.
+            if (key < root.data) {
+                inorderSuccessor[0] = root;  // Set the successor to the current node.
+                root = root.left;  // Move left in the tree.
+            }else { // If the key is greater than the current node, the predecessor could be the current node.
+                inorderPredecessor[0] = root;  // Set the predecessor to the current node.
+                root = root.right;  // Move right in the tree.
+            }
+        }
+    }
+}
