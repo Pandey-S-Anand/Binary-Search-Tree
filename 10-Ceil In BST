@@ -1,0 +1,82 @@
+//Recursive approach
+
+//Intuitive implementation
+
+class Tree {
+    private int ceil = -1; // Variable to store the ceiling value. Initialized to -1 (indicating no ceiling found).
+
+    int findCeil(Node root, int key) {
+        findCeilHelper(root, key); // Helper function to perform the recursive search.
+        return ceil;
+    }
+
+    private void findCeilHelper(Node root, int key) {
+        if (root == null) {
+            return; // Base case: if the current node is null, return (no further processing needed).
+        }
+
+        if (key == root.data) {
+            // If the key matches the current node's value, it is the ceiling itself.
+            ceil = key;
+            return; // No need to search further.
+        }
+
+        if (key < root.data) {
+            // If the key is smaller than the current node's value, this node is a potential ceil.
+            ceil = root.data;
+            findCeilHelper(root.left, key); // Continue searching in the left subtree for a smaller ceiling.
+            return;
+        }
+
+        // If the key is greater than the current node's value, search in the right subtree.
+        findCeilHelper(root.right, key);
+    }
+}
+
+//Optimal implementation
+
+class Tree {
+    int findCeil(Node root, int key) {
+        if (root == null) {
+            return -1; // Base case: if root is null, ceil doesn't exist.
+        }
+
+        if (root.data == key) {
+            return key; // If key matches the node's value, return it as the ceil.
+        }
+        
+        // If key is smaller, the current node is a potential ceil.
+        if (key < root.data) {
+            // Recursively check the left subtree for a smaller possible ceil.
+            int leftCeil = findCeil(root.left, key);
+            return (leftCeil == -1) ? root.data : leftCeil;
+        }
+
+        // If key is greater, ceil must be in the right subtree.
+        return findCeil(root.right, key);
+    }
+}
+
+
+//Iterative approach
+
+class Tree {
+    int findCeil(Node root, int key) {
+        int ceil = -1;
+
+        while (root != null) {
+            if (key == root.data) {
+                return key;
+            }
+
+            if (key < root.data) {
+                ceil = root.data;
+                root = root.left;
+            } else {
+                root = root.right;
+            }
+        }
+
+        return ceil;
+    }
+}
