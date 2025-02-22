@@ -13,6 +13,81 @@
  *     }
  * }
  */
+
+//Naive approach
+
+class Solution {
+    // This variable stores the previous node encountered during the inorder traversal.
+    private TreeNode previousNode; 
+
+    // This variable holds the sum of node values for the current valid BST subtree.
+    private int bstSum;  
+
+    // This variable tracks the maximum sum of any valid BST subtree found in the tree.
+    private int maxSum; 
+
+    public int maxSumBST(TreeNode root) {
+        maxSum = 0;  // Initialize maxSum to 0 before starting the process
+        findLargestBstSumInTree(root);
+        return maxSum;
+    }
+
+    private void findLargestBstSumInTree(TreeNode root) {
+        if (root == null) {
+            return; // Base case: If the node is null, simply return
+        }
+
+        // Check if the subtree rooted at this node is a valid BST, and get the sum of its node values if it is valid.
+        int bstSum = getBstSumIfValid(root);
+        
+        // If bstSum is not -1, it means the subtree is a valid BST. Update maxSum if this subtree's sum is greater than the current maxSum.
+        if (bstSum != -1) {
+            maxSum = Math.max(maxSum, bstSum);
+        }
+
+        // Recursively check the left and right subtrees.
+        findLargestBstSumInTree(root.left);
+        findLargestBstSumInTree(root.right);
+    }
+
+    private int getBstSumIfValid(TreeNode root) {
+        bstSum = 0;          // Reset the sum for the new subtree
+        previousNode = null; // Reset the previous node pointer for inorder traversal
+
+        // If the subtree is a valid BST, bstSum will contain the sum of its node values.
+        if (isValidBST(root)) {
+            return bstSum;  // Return the computed sum if the subtree is valid
+        }
+        return -1; // Return -1 to indicate that the subtree is not a valid BST
+    }
+
+    private boolean isValidBST(TreeNode root) {
+        if (root == null) {
+            return true; // An empty subtree is considered a valid BST
+        }
+
+        // Recursively check the left subtree.
+        if (!isValidBST(root.left)) {
+            return false;
+        }
+
+        // Validate the current node:
+        // The current node's value must be greater than the previous node's value in the inorder traversal.
+        if (previousNode != null && previousNode.val >= root.val) {
+            return false; // Violation of BST property
+        }
+        
+        bstSum += root.val; // Accumulate the current node's value into bstSum
+        previousNode = root; // Update previousNode to the current node
+
+        // Recursively check the right subtree.
+        return isValidBST(root.right);
+    }
+}
+
+
+//Optimal approach
+
 class Solution {
     private static class NodeInfo {
         boolean isBst;    // Indicates if the subtree rooted at this node is a valid BST
