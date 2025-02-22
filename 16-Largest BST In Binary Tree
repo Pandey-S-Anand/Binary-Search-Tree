@@ -7,14 +7,10 @@ class Solution {
 
     static int largestBst(Node root) {
         largestBstSize = 0; // Initialize the largest BST size to 0
-
-        // Start the recursive process to find the largest BST
         findLargestBstInTree(root);
-
         return largestBstSize;
     }
 
-    // Recursive function to traverse the binary tree and check for BSTs
     private static void findLargestBstInTree(Node root) {
         if (root == null) {
             return;
