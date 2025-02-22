@@ -1,0 +1,79 @@
+
+/*
+    Example 1: Valid BST Preorder Traversal
+    Input: {50, 30, 20, 25, 40, 35, 45, 70, 60, 55, 65, 90, 85, 100}
+    
+    Corresponding BST structure:
+          50
+       /       \
+      30         70
+     /  \       /   \
+   20    40    60    90
+     \   / \   / \  /  \
+     25 35 45 55 65 85 100
+     
+
+   Node 50: Range = [min=-∞, max=∞]
+   Node 30: Range = [min=-∞, max=50]
+   Node 20: Range = [min=-∞, max=30]
+   Node 25: Range = [min=20, max=30]
+   Node 40: Range = [min=30, max=50]
+   Node 35: Range = [min=30, max=40]
+   Node 45: Range = [min=40, max=50]
+   
+   Node 70: Range = [min=50, max=∞]
+   Node 60: Range = [min=50, max=70]
+   Node 55: Range = [min=50, max=60]
+   Node 65: Range = [min=60, max=70]
+   Node 90: Range = [min=70, max=∞]
+   Node 85: Range = [min=70, max=90]
+   Node 100: Range = [min=90, max=∞]
+*/
+
+/*
+    Example 2: Invalid BST Preorder Traversal
+    Input: {50, 30, 20, 25, 60, 10, 70}
+    
+    Corresponding BST structure:
+          50
+       /      \
+      30       60
+     /  \      ❌
+   20    25     
+    
+    Where things go wrong:
+    - 10 has nowhere to go. 
+    - It cannot go left of 60 because it's smaller than 60, but it is also smaller than 50, which is against the BST rule.
+    - It cannot go right of 60 either because it's smaller than 60.
+    - Therefore, the array is not fully processed, and the structure can't be completed as a valid BST.
+*/
+
+class Solution {
+    // Global index to track the current element in the array
+    private static int index;
+  
+    static int canRepresentBST(int arr[], int n) {
+        index = 0;  // Reset index for each function call
+        buildBst(arr, n, Integer.MIN_VALUE, Integer.MAX_VALUE);
+        
+        // If all elements are processed , it's a valid BST preorder
+        return (index == n) ? 1 : 0;
+    }
+    
+    private static void buildBst(int arr[], int n, int min, int max) {
+        // Base condition: If all elements are processed or the value is out of bounds
+        if (index == n || arr[index] < min || arr[index] > max) {
+            return;
+        }
+        
+        // Fetch the current value from preorder traversal and increment index
+        int value = arr[index];
+        index++;
+
+        // Recursively build the left subtree with an updated max constraint
+        buildBst(arr, n, min, value);
+        
+        // Recursively build the right subtree with an updated min constraint
+        buildBst(arr, n, value, max);
+    }
+}
