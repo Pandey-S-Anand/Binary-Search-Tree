@@ -77,3 +77,26 @@ class Solution {
         buildBst(arr, n, value, max);
     }
 }
+
+//Aliter
+
+class Solution {
+    static int canRepresentBST(int arr[], int n) {
+        int[] index = { 0 };
+        buildBst(arr, n, Integer.MIN_VALUE, Integer.MAX_VALUE, index);
+        return (index[0] == n) ? 1 : 0;
+    }
+
+    private static void buildBst(int arr[], int n, int min, int max, int[] index) {
+        if (index[0] == n || arr[index[0]] < min || arr[index[0]] > max) {
+            return;
+        }
+
+        int value = arr[index[0]];
+        index[0]++;
+
+        buildBst(arr, n, min, value, index);
+
+        buildBst(arr, n, value, max, index);
+    }
+}
