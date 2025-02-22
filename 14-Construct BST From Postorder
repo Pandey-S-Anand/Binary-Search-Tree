@@ -1,3 +1,42 @@
+//Naive approach
+
+class GFG {
+    public static Node constructTree(int postorder[], int n) {
+        // Call the helper function with the entire range of the array (0 to n-1)
+        return constructTree(postorder, 0, n - 1);
+    }
+
+    private static Node constructTree(int postorder[], int low, int high) {
+        // Base case: If low index exceeds high index, the subtree is empty
+        if (low > high) {
+            return null;
+        }
+
+        // The last element in the current range (postorder[high]) is the root of the tree/subtree
+        Node node = new Node(postorder[high]);
+
+        int index = high - 1;
+
+        // Traverse backwards to find the first element smaller than the root. The elements greater than the root will form the right subtree
+        while (index >= 0 && postorder[index] > postorder[high]) {
+            index--;
+        }
+
+        // Recursively construct the right subtree with the elements greater than the root
+        node.right = constructTree(postorder, index + 1, high - 1);
+
+        // Recursively construct the left subtree with the elements smaller than the root
+        node.left = constructTree(postorder, low, index);
+
+        // Return the root node of the constructed subtree
+        return node;
+    }
+}
+
+
+
+//Optimal approach
+
 class GFG {
     // Static index to keep track of the current node in postorder traversal
     private static int index;
