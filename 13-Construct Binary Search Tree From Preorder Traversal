@@ -14,6 +14,44 @@
  * }
  */
 
+//Naive approach
+
+class Solution {
+    public TreeNode bstFromPreorder(int[] preorder) {
+        // Start the recursive construction of the tree, from the entire array (0 to preorder.length - 1)
+        return bstFromPreorder(preorder, 0, preorder.length - 1);
+    }
+
+    // Helper function to recursively build the BST
+    private TreeNode bstFromPreorder(int[] preorder, int low, int high) {
+        // Base case: If low index exceeds high index, the subtree is empty
+        if (low > high) {
+            return null;
+        }
+
+        // The first element in the preorder array (preorder[low]) is the root of the tree/subtree
+        TreeNode root = new TreeNode(preorder[low]);
+
+        // Find the first element that is greater than the root (preorder[low]) to split the array into left and right subtrees
+        int index = low + 1;
+        while (index < preorder.length && preorder[index] < preorder[low]) {
+            index++;
+        }
+
+        // Recursively build the left subtree with elements that are less than the root
+        root.left = bstFromPreorder(preorder, low + 1, index - 1);
+        
+        // Recursively build the right subtree with elements that are greater than the root
+        root.right = bstFromPreorder(preorder, index, high);
+
+        // Return the constructed subtree rooted at 'root'
+        return root;
+    }
+}
+
+
+// Optimal approach
+
 class Solution {
     // Index to track the current position in the preorder array
     private int index = 0;
