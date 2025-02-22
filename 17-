@@ -1,0 +1,73 @@
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+class Solution {
+    private static class NodeInfo {
+        boolean isBst;    // Indicates if the subtree rooted at this node is a valid BST
+        int max;           // The maximum value in the current subtree
+        int min;           // The minimum value in the current subtree
+        int sum;           // The sum of values in the current subtree (total value of the BST)
+
+        NodeInfo(boolean isBst, int max, int min, int sum) {
+            this.isBst = isBst;  
+            this.max = max;       
+            this.min = min; 
+            this.sum = sum;    
+        }
+    }
+
+    // Variable to track the maximum sum of a valid BST found in the tree
+    private int maxSum;
+
+    // Main method to return the maximum sum of any BST subtree in the binary tree
+    public int maxSumBST(TreeNode root) {
+        maxSum = 0;  // Initialize the maxSum to 0 before starting the process
+        largestBstSum(root);
+        return maxSum;
+    }   
+
+    private NodeInfo largestBstSum(TreeNode root) {
+        // Base case: If the node is null, it is considered a valid BST with extreme values and sum as 0
+        if (root == null) {
+            return new NodeInfo(true, Integer.MIN_VALUE, Integer.MAX_VALUE, 0);
+        }
+
+        // If the node is a leaf, it is by itself a valid BST.
+        if (root.left == null && root.right == null) {
+            maxSum = Math.max(maxSum, root.val);  // Update maxSum if this node forms the largest BST so far
+            return new NodeInfo(true, root.val, root.val, root.val);  // Return a valid BST with sum as root's value
+        }
+
+        // Recursively process the left and right subtrees
+        NodeInfo left = largestBstSum(root.left);
+        NodeInfo right = largestBstSum(root.right);
+        
+        // If both left and right subtrees are BSTs and root's value is greater than left's max and smaller than right's min, then the current subtree is a valid BST
+        if (left.isBst && right.isBst && root.val > left.max && root.val < right.min) {
+            // Calculate the sum of the current subtree (including the root and its valid BST subtrees)
+            int sum = root.val + left.sum + right.sum;
+            // Calculate the max and min for the current subtree
+            int max = Math.max(root.val, right.max);
+            int min = Math.min(root.val, left.min);
+            // Update maxSum if the current subtree's sum is larger than the current maxSum
+            maxSum = Math.max(maxSum, sum);
+            // Return the updated NodeInfo for this valid BST subtree
+            return new NodeInfo(true, max, min, sum);
+        }
+
+        // If the current subtree is not a valid BST, return an invalid NodeInfo (no sum, no valid subtree)
+        return new NodeInfo(false, 0, 0, 0);
+    }
+}
