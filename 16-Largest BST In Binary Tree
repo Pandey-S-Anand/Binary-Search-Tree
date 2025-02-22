@@ -1,0 +1,145 @@
+//Brutefroce approach
+
+class Solution {
+    private static Node previousNode; // Stores the previous node during inorder traversal
+    private static int nodeCount;  // To count the number of nodes in a valid BST
+    private static int largestBstSize; // Stores the size of the largest BST found
+
+    static int largestBst(Node root) {
+        largestBstSize = 0; // Initialize the largest BST size to 0
+
+        // Start the recursive process to find the largest BST
+        findLargestBstInTree(root);
+
+        return largestBstSize;
+    }
+
+    // Recursive function to traverse the binary tree and check for BSTs
+    private static void findLargestBstInTree(Node root) {
+        if (root == null) {
+            return;
+        }
+
+        // Check if the current subtree is a valid BST and calculate its size
+        int bstSize = getBstSizeIfValid(root);
+        
+        // If the current subtree is a valid BST, update the largest BST size
+        if (bstSize != -1) {
+            largestBstSize = Math.max(largestBstSize, bstSize);
+        }
+
+        // Recursively check the left and right subtrees
+        findLargestBstInTree(root.left);
+        findLargestBstInTree(root.right);
+    }
+
+    private static int getBstSizeIfValid(Node root) {
+        nodeCount = 0; // Reset the node count
+        previousNode = null; // Initialize the previous node as null
+
+        // Perform inorder traversal to check if the subtree is a valid BST
+        if (isValidBST(root)) {
+            return nodeCount; // Return the count of nodes in the valid BST
+        }
+
+        return -1; // If the subtree is not a valid BST, return -1
+    }
+
+    private static boolean isValidBST(Node root) {
+        if (root == null) {
+            return true; // An empty subtree is always a valid BST
+        }
+
+        // Recursively check the left subtree
+        if (!isValidBST(root.left)) {
+            return false;
+        }
+
+        // Check if the current node violates the BST property (left < root < right)
+        if (previousNode != null && previousNode.data >= root.data) {
+            return false; // If the current node's value is not greater than the previous node, it's not a valid BST
+        }
+
+        // Update the previous node 
+        previousNode = root;
+        nodeCount++; //Increase the count of nodes in the valid BST
+
+        // Recursively check the right subtree
+        return isValidBST(root.right);
+    }
+}
+
+
+//Optimal approach
+
+/*
+ * The primary criterion for a Binary Search Tree (BST) is:
+ * 
+ * 1. Its left subtree must be a valid BST.
+ * 2. Its right subtree must be a valid BST.
+ * 3. The current node value should be greater than all the values in the left subtree.
+ *    (This can be confirmed if the left subtree's maximum value is less than the current node's value.)
+ * 4. The current node value should be smaller than all the values in the right subtree.
+ *    (This can be confirmed if the right subtree's minimum value is greater than the current node's value.)
+ * 
+ * If the above conditions are satisfied, the current subtree rooted at the node is a valid BST.
+ */
+
+
+class Solution{
+    private static class NodeInfo{
+        boolean isBst;    // Whether the subtree rooted at this node is a valid BST
+        int max;           // The maximum value in the current subtree
+        int min;           // The minimum value in the current subtree
+        int size;          // The size of the current subtree (number of nodes)
+
+        NodeInfo(boolean isBst, int max, int min, int size){
+            this.isBst = isBst;  
+            this.max = max;       
+            this.min = min; 
+            this.size = size;    
+        }
+    }
+    
+    // Variable to track the size of the largest BST found
+    private static int maxSize;
+
+    static int largestBst(Node root){
+        maxSize = 0;  // Initialize maxSize to 0 before starting the search
+        largestBstHelper(root); 
+        return maxSize;
+    }
+
+    private static NodeInfo largestBstHelper(Node root){
+        // Base case: If the node is null, it's considered a valid BST with extreme values
+        if (root == null) {
+            return new NodeInfo(true, Integer.MIN_VALUE, Integer.MAX_VALUE, 0);
+        }
+
+        // If the node is a leaf (no left or right children), it's a valid BST of size 1
+        if(root.left == null && root.right == null){
+            maxSize = Math.max(maxSize, 1);  // Update maxSize if a new BST of size 1 is found
+            return new NodeInfo(true, root.data, root.data, 1);  // Return a valid BST with size 1
+        }
+
+        // Recursive step: Process the left and right subtrees
+        NodeInfo left = largestBstHelper(root.left);
+        NodeInfo right = largestBstHelper(root.right);
+        
+        // If both left and right subtrees are BSTs and root's value is greater than left's max and smaller than right's min, then the current subtree is a valid BST
+        if(left.isBst && right.isBst && root.data > left.max && root.data < right.min){
+            // Calculate the size of the current subtree
+            int size = 1 + left.size + right.size;
+            // Calculate the max and min for the current subtree
+            int max = Math.max(root.data, right.max);
+            int min = Math.min(root.data, left.min);
+            // Update the maxSize if the current subtree size is larger
+            maxSize = Math.max(maxSize, size);
+            // Return the information of the current subtree, which is a valid BST
+            return new NodeInfo(true, max, min, size);
+        }
+
+        // If the current subtree is not a valid BST, return an invalid NodeInfo
+        return new NodeInfo(false, 0, 0, 0);
+    }
+}
