@@ -1,0 +1,76 @@
+//Bruteforce approach
+
+class Solution {
+    // Variable to store the minimum absolute difference
+    private static int minAbsDiff;
+
+    static int minDiff(Node root, int k) {
+        // Initialize minAbsDiff to the largest possible integer value
+        minAbsDiff = Integer.MAX_VALUE;
+
+        // Start the traversal
+        updateMinAbsDiff(root, k);
+
+        // Return the minimum absolute difference found
+        return minAbsDiff;
+    }
+
+    private static void updateMinAbsDiff(Node node, int k) {
+        // Base case: If the current node is null, return
+        if (node == null) {
+            return;
+        }
+
+        // Update the minAbsDiff with the absolute difference between the current node's value and k
+        minAbsDiff = Math.min(minAbsDiff, Math.abs(node.data - k));
+
+        // Recursively traverse the left subtree
+        updateMinAbsDiff(node.left, k);
+
+        // Recursively traverse the right subtree
+        updateMinAbsDiff(node.right, k);
+    }
+}
+
+
+//Optimal approach
+
+class Solution {
+    private static int minAbsDiff; 
+    
+    static int minDiff(Node root, int k) { 
+        // Initialize minAbsDiff with maximum possible value
+        minAbsDiff = Integer.MAX_VALUE; 
+        
+        // Start the recursive search for the closest value
+        findMinAbsdiff(root, k);
+        
+        // Return the minimum absolute difference found
+        return minAbsDiff;
+    } 
+    
+    private static void findMinAbsdiff(Node root, int k) {
+        // Base case: If the node is null, return
+        if (root == null) {
+            return; 
+        }
+
+        // Update minAbsDiff with the absolute difference of the current node
+        minAbsDiff = Math.min(minAbsDiff, Math.abs(root.data - k));   
+        
+        // If k is smaller than root.data, we need a smaller value to get closer to k, so we move to the left subtree.
+        if (k < root.data) {
+            findMinAbsdiff(root.left, k);  
+            return;
+        }
+        
+        // If k is greater than root.data, we need a larger value to get closer to k, so we move to the right subtree.
+        if (k > root.data) {
+            findMinAbsdiff(root.right, k);    
+            return;
+        }
+        
+        // If k is exactly equal to root.data, return immediately as the difference is zero
+        return;
+    }
+}
