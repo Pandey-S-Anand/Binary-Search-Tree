@@ -1,0 +1,26 @@
+class Solution {
+    public static Node deleteNode(Node root, int k) {
+        // Base case: If the tree is empty, return null.
+        if (root == null) {
+            return null;
+        }
+
+        /*
+         * If the current node's value is greater than or equal to k:
+         * By BST properties, all nodes in its right subtree are also > k.
+         * However, its left subtree might contain nodes with values >= k that need to be removed.
+         * Therefore, discard the current node and continue processing only the left subtree.
+         */
+        if (root.data >= k) {
+            return deleteNode(root.left, k);
+        }
+        /*
+         * If the current node's value is less than k, it is valid.
+         * By BST properties, all nodes in its left subtree are also < k.
+         * However, its right subtree might contain nodes with values >= k that need to be removed.
+         * Recursively process the right subtree and attach the pruned subtree back to root.right.
+         */
+        root.right = deleteNode(root.right, k);
+        return root;
+    }
+}
