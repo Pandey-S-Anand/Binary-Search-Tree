@@ -1,0 +1,67 @@
+class GfG {
+    public static Node changeKey(Node root, int oldKey, int newKey) {
+        // Delete the node with the old key
+        root = deleteKey(root, oldKey);
+        // Insert a new node with the new key
+        root = insertKey(root, newKey);
+        return root;
+    }
+
+    private static Node deleteKey(Node root, int key) {
+        if (root == null) {
+            return null;
+        }
+
+        // Traverse the tree to find the node to delete
+        if (key < root.data) {
+            root.left = deleteKey(root.left, key);
+        } else if (key > root.data) {
+            root.right = deleteKey(root.right, key);
+        } else {
+            // Node to be deleted found
+
+            // Case 1: Node has no children (leaf node)
+            if (root.left == null && root.right == null) {
+                return null;
+            }
+
+            // Case 2: Node has only one child
+            if (root.left == null) {
+                return root.right;
+            }
+            if (root.right == null) {
+                return root.left;
+            }
+
+            // Case 3: Node has two children
+            // Find the inorder predecessor (maximum value in the left subtree)
+            Node inorderPredecessor = findInorderPredecessor(root);
+            // Replace the node's data with the inorder predecessor's data
+            root.data = inorderPredecessor.data;
+            // Delete the inorder predecessor node
+            root.left = deleteKey(root.left, inorderPredecessor.data);
+        }
+        return root;
+    }
+
+    private static Node findInorderPredecessor(Node root) {
+        Node node = root.left;
+        while (node.right != null) {
+            node = node.right;
+        }
+        return node;
+    }
+
+    private static Node insertKey(Node root, int key) {
+        if (root == null) {
+            return new Node(key);
+        }
+        if (key < root.data) {
+            root.left = insertKey(root.left, key);
+        } else if (key > root.data) {
+            root.right = insertKey(root.right, key);
+        }
+        // If key == root.data, do not insert duplicates
+        return root;
+    }
+}
