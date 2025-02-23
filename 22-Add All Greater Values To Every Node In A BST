@@ -1,3 +1,45 @@
+//Naive approach
+
+class Solution {
+    private int totalSum; // Variable to store the total sum of all nodes
+    private List<Node> inorderTraversal; // List to store nodes in inorder sequence
+
+    public Node modify(Node root) {
+        inorderTraversal = new ArrayList<>();
+        totalSum = 0;
+
+        // Step 1: Perform inorder traversal and compute the total sum of all nodes
+        findInorderTraversal(root);
+
+        // Step 2: Modify the BST using the inorder list
+        for (Node node : inorderTraversal) {
+            totalSum -= node.data; // Subtract the current node's value from the total sum
+            node.data += totalSum; // Update node's value with the sum of all greater nodes + original node value
+        }
+
+        return root; // Return the modified root
+    }
+
+    private void findInorderTraversal(Node root) {
+        if (root == null) {
+            return;
+        }
+
+        // Traverse left subtree
+        findInorderTraversal(root.left);
+
+        // Store the current node and update the sum
+        inorderTraversal.add(root);
+        totalSum += root.data;
+
+        // Traverse right subtree
+        findInorderTraversal(root.right);
+    }
+}
+
+
+//Optimal approach
+
 class Solution {
     private int sum; // Global variable to keep track of the running sum of greater values
 
