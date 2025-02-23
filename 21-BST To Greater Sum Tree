@@ -1,0 +1,39 @@
+/**
+ * Recursively performs a reverse in-order traversal (right, node, left) of the BST.
+ * As nodes are visited in descending order, we update each node's value with the
+ * accumulated sum of all nodes that have been processed (which are all greater than the current node).
+ */
+ 
+class Solution {
+    // Global variable to keep track of the accumulated sum of nodes (with values greater than the current node).
+    private static int sum = 0;
+
+    public static Node transformTree(Node root) {
+        // Reset the sum before starting the transformation.
+        sum = 0;
+        // Start the reverse in-order traversal to update each node.
+        convertBST(root);
+        return root;
+    }
+
+    private static void convertBST(Node node) {
+        if (node == null) {
+            return;
+        }
+
+        // Process the right subtree first (nodes with greater values).
+        convertBST(node.right);
+
+        // Store the original value before updating.
+        int originalValue = node.data;
+
+        // Update the current node's value to the accumulated sum.
+        node.data = sum;
+
+        // Add the original value of the current node to the sum.
+        sum += originalValue;
+
+        // Process the left subtree.
+        convertBST(node.left);
+    }
+}
