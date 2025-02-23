@@ -114,6 +114,20 @@ class Solution{
 
         // If the node is a leaf (no left or right children), it's a valid BST of size 1
         if(root.left == null && root.right == null){
+             /*
+                For example, consider the following  binary tree 
+    
+                   1
+                  / \
+                 4   4
+                / \
+               6   8
+    
+               Here, if the largest BST in the entire tree is only a single node (i.e., size 1),
+               it's important to update maxSize at the leaf nodes. Each leaf node is a valid BST of size 1.
+               Without this update (maxSize = Math.max(maxSize, 1)), maxSize might incorrectly remain 0,
+               even though there is at least one valid BST (a single node).
+            */
             maxSize = Math.max(maxSize, 1);  // Update maxSize if a new BST of size 1 is found
             return new NodeInfo(true, root.data, root.data, 1);  // Return a valid BST with size 1
         }
