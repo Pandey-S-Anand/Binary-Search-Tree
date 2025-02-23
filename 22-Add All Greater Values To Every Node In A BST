@@ -1,0 +1,35 @@
+class Solution {
+    private int sum; // Global variable to keep track of the running sum of greater values
+
+    public Node modify(Node root) {
+        sum = 0; // Initialize sum to 0 before starting the transformation
+        modifyHelper(root); // Start the modification process
+        return root; // Return the modified BST root
+    }
+
+    /**
+     * Recursively performs a reverse in-order traversal (right, node, left) of the BST.
+     * As nodes are visited in descending order, we update each node's value with
+     * the accumulated sum of all nodes that have been processed (which are all greater than the current node) plus its original value.
+     */
+    private void modifyHelper(Node root) {
+        if (root == null) {
+            return; // Base case: If the node is null, return immediately
+        }
+
+        // Process the right subtree first (greater values in BST)
+        modifyHelper(root.right);
+
+        // Store the original value before modification
+        int originalValue = root.data;
+
+        // Update the current node by adding the sum of all greater nodes
+        root.data += sum;
+
+        // Update the running sum to include the current node's original value
+        sum += originalValue;
+
+        // Process the left subtree (smaller values in BST)
+        modifyHelper(root.left);
+    }
+}
