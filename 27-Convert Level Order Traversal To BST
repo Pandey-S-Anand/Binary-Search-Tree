@@ -1,0 +1,73 @@
+class GFG {
+    // Helper class to store information about each node along with its valid range
+    private static class NodeInfo {
+        Node node;  // The actual BST node
+        int min;    // Lower bound for valid values in this subtree
+        int max;    // Upper bound for valid values in this subtree
+
+        NodeInfo(Node node, int min, int max) {
+            this.node = node;
+            this.min = min;
+            this.max = max;
+        }
+    }
+
+    /*
+        Example:
+        Input Level-Order: {7, 4, 12, 3, 6, 8, 1, 5, 10}
+
+        Constructed BST:
+        
+                7
+               /  \
+              4    12
+             / \   /
+            3   6 8
+           /   /   \
+          1   5    10
+    */
+
+    public Node constructBST(int[] arr) {
+        // Edge case: If the input array is empty, return null
+        if (arr.length == 0) {
+            return null;
+        }
+
+        // Queue to maintain nodes and their valid value ranges
+        Queue<NodeInfo> queue = new ArrayDeque<>();
+
+        // Step 1: Create the root node from the first element of the level-order array
+        Node root = new Node(arr[0]);
+
+        // Step 2: Insert the root into the queue with the full valid range (-∞, ∞)
+        queue.offer(new NodeInfo(root, Integer.MIN_VALUE, Integer.MAX_VALUE));
+
+        int i = 1; // Index to track elements in the array
+
+        // Step 3: Process remaining elements from the level-order array
+        while (i < arr.length) {
+            // Fetch the front node from the queue
+            NodeInfo nodeInfo = queue.poll();
+            Node node = nodeInfo.node; // Extract the actual BST node
+
+            // Step 4: Check if the next element can be inserted as the left child
+            if (arr[i] > nodeInfo.min && arr[i] < node.data) {
+                Node leftNode = new Node(arr[i]); // Create a new left child
+                node.left = leftNode; // Attach it to the left of the current node
+                queue.offer(new NodeInfo(leftNode, nodeInfo.min, node.data)); // Add it to the queue with updated range
+                i++; // Move to the next element in the array
+            }
+
+            // Step 5: Check if the next element can be inserted as the right child
+            if (i < arr.length && arr[i] > node.data && arr[i] < nodeInfo.max) {
+                Node rightNode = new Node(arr[i]); // Create a new right child
+                node.right = rightNode; // Attach it to the right of the current node
+                queue.offer(new NodeInfo(rightNode, node.data, nodeInfo.max)); // Add it to the queue with updated range
+                i++; // Move to the next element in the array
+            }
+        }
+
+        // Step 6: Return the root of the constructed BST
+        return root;
+    }
+}
