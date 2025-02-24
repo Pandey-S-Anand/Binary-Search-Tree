@@ -1,0 +1,54 @@
+/**
+ * A Special Max Heap should satisfy two key properties: :
+ * 1. Max Heap Property → The parent node must be greater than all its children (both left and right).
+ * 2. Left subtree values < Right subtree values.
+ */
+
+/*
+ * Explanation:
+ * - In inorder traversal, we get Left (smallest) -> Root (second largest) -> Right (largest).
+ * - When we replace node values in postorder order, it naturally ensures:
+ *   1. Left child gets assigned first (smallest i.e. inorder left). The smallest value is assigned to the left child.
+ *   2. Right child gets assigned second (inorder root). The second largest value is assigned to the right child.
+ *.  3. Parent gets assigned last (inorder right). The largest value is assigned  to the parent.
+ * - This ensures the Max Heap property:
+ * - Parent is greater than both left and right children.
+ * - The left subtree values are less than the right subtree values, which maintains the special condition.
+ */
+
+class BSTtoSpecialMaxHeap {
+    private static List<Integer> sortedValues; // Stores inorder traversal (sorted values)
+    private static int currentIndex; // Keeps track of index while replacing values
+
+    public static void convertToMaxHeap(Node root) {
+        sortedValues = new ArrayList<>();
+        currentIndex = 0;
+
+        // Step 1: Store the sorted values from inorder traversal
+        findInorderTraversal(root);
+
+        // Step 2: Replace node values using postorder traversal
+        replaceValuesWithPostorder(root);
+    }
+
+    private static void findInorderTraversal(Node root) {
+        if (root == null) {
+            return;
+        }
+
+        findInorderTraversal(root.left);
+        sortedValues.add(root.value);
+        findInorderTraversal(root.right);
+    }
+
+    private static void replaceValuesWithPostorder(Node root) {
+        if (root == null) {
+            return;
+        }
+
+        replaceValuesWithPostorder(root.left);
+        replaceValuesWithPostorder(root.right);
+
+        root.value = sortedValues.get(currentIndex++);
+    }
+}
