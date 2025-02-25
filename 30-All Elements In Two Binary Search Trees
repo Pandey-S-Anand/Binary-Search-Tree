@@ -14,9 +14,6 @@
  * }
  */
 
-
- //Bruteforce approach
-
 class Solution {
     public List<Integer> getAllElements(TreeNode root1, TreeNode root2) {
         List<Integer> inorderTraversal1 = new ArrayList<>();
@@ -63,7 +60,3 @@ class Solution {
         return merged;
     }
 }
-
-
-//Optimal approach
-
