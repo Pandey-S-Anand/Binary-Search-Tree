@@ -1,0 +1,92 @@
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ * int val;
+ * TreeNode left;
+ * TreeNode right;
+ * TreeNode() {}
+ * TreeNode(int val) { this.val = val; }
+ * TreeNode(int val, TreeNode left, TreeNode right) {
+ * this.val = val;
+ * this.left = left;
+ * this.right = right;
+ * }
+ * }
+ */
+
+//Naive approach
+ 
+class Solution {
+    private List<Integer> inorderTraversal; // List to store the inorder traversal of the tree
+
+    public int getMinimumDifference(TreeNode root) {
+        inorderTraversal = new ArrayList<>(); // Initialize the inorder traversal list
+        performInorderTraversal(root); // Perform inorder traversal to collect node values
+        /*
+         * The crux of the solution: Since the inorder traversal of a BST gives us
+         * sorted values,
+         * the minimum absolute difference will always be between two consecutive values
+         * in this sorted list.
+         */
+        return findMinAbsDifference(); // Find and return the minimum absolute difference
+    }
+
+    private void performInorderTraversal(TreeNode root) {
+        if (root == null) {
+            return;
+        }
+
+        performInorderTraversal(root.left);
+
+        inorderTraversal.add(root.val);
+
+        performInorderTraversal(root.right);
+    }
+
+
+    private int findMinAbsDifference() {
+        int minAbsDiff = Integer.MAX_VALUE; // Initialize with the largest possible value
+
+        for (int i = 1; i < inorderTraversal.size(); i++) {
+            // Calculate the absolute difference between consecutive values and update the minimum difference
+            minAbsDiff = Math.min(minAbsDiff, Math.abs(inorderTraversal.get(i) - inorderTraversal.get(i - 1)));
+        }
+
+        return minAbsDiff; // Return the minimum absolute difference found
+    }
+}
+
+
+//Optimal approach
+
+class Solution {
+    private int previousNodeValue;  // To store the value of the previous node during inorder traversal
+    private int minAbsoluteDifference;  // To store the minimum absolute difference found
+
+    public int getMinimumDifference(TreeNode root) {
+        previousNodeValue = -1;  // Initialize previous node value to -1 (not a valid tree value)
+        minAbsoluteDifference = Integer.MAX_VALUE;  // Initialize minimum absolute difference to maximum value
+        inorderTraversal(root);  // Perform inorder traversal to calculate the minimum difference
+        return minAbsoluteDifference; 
+    }
+
+    private void inorderTraversal(TreeNode currentNode) {
+        if (currentNode == null) {
+            return;  // Base case: If the current node is null, return
+        }
+
+        // Recursively traverse the left subtree
+        inorderTraversal(currentNode.left);
+
+        if (previousNodeValue != -1) {  // Skip the first node where previous value is not set
+            // Find the difference between current node and the previous node in traversal
+            minAbsoluteDifference = Math.min(minAbsoluteDifference, Math.abs(currentNode.val - previousNodeValue));  // Update min difference
+        }
+
+        // Update previous node value to the current node's value
+        previousNodeValue = currentNode.val;
+
+        // Recursively traverse the right subtree
+        inorderTraversal(currentNode.right);
+    }
+}
