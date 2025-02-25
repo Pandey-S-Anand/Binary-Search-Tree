@@ -1,0 +1,189 @@
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ * int val;
+ * TreeNode left;
+ * TreeNode right;
+ * TreeNode() {}
+ * TreeNode(int val) { this.val = val; }
+ * TreeNode(int val, TreeNode left, TreeNode right) {
+ * this.val = val;
+ * this.left = left;
+ * this.right = right;
+ * }
+ * }
+ */
+
+//Naive approach
+ 
+class Solution {
+    private int highestFrequency;
+    private Map<Integer, Integer> frequencyMap;
+
+    public int[] findMode(TreeNode root) {
+        frequencyMap = new HashMap<>();
+        highestFrequency = 0;
+
+        // Step 1: Populate the frequency map using inorder traversal
+        traverseAndCount(root);
+
+        // Step 2: Count the number of modes
+        int modeCount = 0;
+        for (int frequency : frequencyMap.values()) {
+            if (frequency == highestFrequency) {
+                modeCount++;
+            }
+        }
+
+        // Step 3: Store the mode values directly in an array
+        int[] modes = new int[modeCount];
+        int index = 0;
+        for (int key : frequencyMap.keySet()) {
+            if (frequencyMap.get(key) == highestFrequency) {
+                modes[index++] = key;
+            }
+        }
+
+        return modes;
+    }
+
+    private void traverseAndCount(TreeNode node) {
+        if (node == null) {
+            return;
+        }
+
+        traverseAndCount(node.left);
+
+        // Update frequency map
+        frequencyMap.put(node.val, frequencyMap.getOrDefault(node.val, 0) + 1);
+        highestFrequency = Math.max(highestFrequency, frequencyMap.get(node.val));
+
+        traverseAndCount(node.right);
+    }
+}
+
+
+//Better approach
+
+class Solution {
+    // Stores the maximum frequency of any value in the tree
+    private int maxFrequency;
+
+    // Stores the frequency of each value in the tree
+    private Map<Integer, Integer> frequencyMap;
+
+    // Stores the mode values (values with the highest frequency)
+    private List<Integer> modes;
+
+    public int[] findMode(TreeNode root) {
+        frequencyMap = new HashMap<>();
+        maxFrequency = 0;
+        modes = new ArrayList<>();
+
+        // Step 1: Perform an in-order traversal to populate the frequency map
+        traverseAndCount(root);
+
+        // Step 2: Convert the list of mode values to an array and return
+        return convertToArray();
+    }
+
+    private void traverseAndCount(TreeNode root) {
+        if (root == null) {
+            return;
+        }
+
+        // Recursive call to traverse the left subtree
+        traverseAndCount(root.left);
+
+        // Update frequency map for the current node value
+        int frequency = frequencyMap.getOrDefault(root.val, 0) + 1;
+        frequencyMap.put(root.val, frequency);
+
+        // Update the mode list based on the frequency
+        if (frequency > maxFrequency) {
+            // Found a new maximum frequency, reset the mode list
+            modes.clear();
+            maxFrequency = frequency;
+            modes.add(root.val);
+        } else if (frequency == maxFrequency) {
+            // Current value matches the maximum frequency, add it to the mode list
+            modes.add(root.val);
+        }
+
+        // Recursive call to traverse the right subtree
+        traverseAndCount(root.right);
+    }
+
+    private int[] convertToArray() {
+        int[] arr = new int[modes.size()];
+        for (int i = 0; i < modes.size(); i++) {
+            arr[i] = modes.get(i);
+        }
+        return arr;
+    }
+}
+
+
+//Optimal approach
+
+/**
+ * In-order traversal of a BST produces a sorted sequence, so duplicate values appear consecutively,  making frequency counting easy.
+ * Instead of using a HashMap to count frequencies, we process elements on the go 
+ * while maintaining a running frequency count.
+ */
+class Solution {
+    private int previousValue;   // Tracks the previous node value
+    private int currentFrequency; // Frequency of the current value
+    private int maxFrequency;    // Maximum frequency encountered
+    private List<Integer> modes; // Stores the mode values dynamically
+
+    public int[] findMode(TreeNode root) {
+        previousValue = Integer.MIN_VALUE;
+        currentFrequency = 0;
+        maxFrequency = 0;
+        modes = new ArrayList<>();
+
+        // Step 1: Perform in-order traversal to find the mode
+        inOrderTraverse(root);
+
+        // Step 2: Convert list of mode values to an array and return
+        return convertToArray();
+    }
+
+    private void inOrderTraverse(TreeNode root) {
+        if (root == null) {
+            return;
+        }
+
+        // Recursively traverse the left subtree
+        inOrderTraverse(root.left);
+
+        // Process the current node value
+        if (root.val == previousValue) {
+            currentFrequency++;  // Increment frequency for repeated values
+        } else {
+            currentFrequency = 1; // Reset count for a new value
+            previousValue = root.val;
+        }
+
+        // Update the mode list based on frequency
+        if (currentFrequency > maxFrequency) {
+            maxFrequency = currentFrequency;
+            modes.clear();  // New max frequency found, reset the list
+            modes.add(root.val);
+        } else if (currentFrequency == maxFrequency) {
+            modes.add(root.val);  // Add value with the same max frequency
+        }
+
+        // Recursively traverse the right subtree
+        inOrderTraverse(root.right);
+    }
+
+    private int[] convertToArray() {
+        int[] arr = new int[modes.size()];
+        for (int i = 0; i < modes.size(); i++) {
+            arr[i] = modes.get(i);
+        }
+        return arr;
+    }
+}
