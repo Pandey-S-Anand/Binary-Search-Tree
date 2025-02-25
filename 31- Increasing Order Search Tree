@@ -1,0 +1,100 @@
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ * int val;
+ * TreeNode left;
+ * TreeNode right;
+ * TreeNode() {}
+ * TreeNode(int val) { this.val = val; }
+ * TreeNode(int val, TreeNode left, TreeNode right) {
+ * this.val = val;
+ * this.left = left;
+ * this.right = right;
+ * }
+ * }
+ */
+
+//Naive approach
+ 
+class Solution {
+    private List<TreeNode> inorderNodes; // List to store nodes in inorder traversal
+
+    public TreeNode increasingBST(TreeNode root) {
+        inorderNodes = new ArrayList<>();
+        // Perform inorder traversal to collect the nodes in sorted order
+        performInorderTraversal(root);
+
+        // The leftmost node (first element in inorderNodes) will be the new root
+        TreeNode previousNode = inorderNodes.get(0); // This is the new root
+        /*
+         * The leftmost node naturally has no left child,
+         * so there's no need to explicitly set previousNode.left = null.
+         */
+        /*
+         * Iterate over the collected nodes starting from the second node
+         * to create a right-skewed tree (i.e., each node's right child points to the next node)
+         */
+        for (int i = 1; i < inorderNodes.size(); i++) {
+            TreeNode currentNode = inorderNodes.get(i);
+            previousNode.right = currentNode; // Set the previous node's right child to current
+            currentNode.left = null; // Ensure current node has no left child
+            previousNode = currentNode; // Move the previous pointer to the current node
+        }
+
+        // Return the root of the new right-skewed BST (the first node in inorder traversal)
+        return previousNode;
+    }
+
+    private void performInorderTraversal(TreeNode root) {
+        if (root == null) {
+            return;
+        }
+
+        // Recursively visit left subtree
+        performInorderTraversal(root.left);
+
+        // Add current node to the list
+        inorderNodes.add(root);
+
+        // Recursively visit right subtree
+        performInorderTraversal(root.right);
+    }
+}
+
+
+//Optimal approach
+
+class Solution {
+    private TreeNode newRoot;  // The root of the transformed right-skewed tree
+    private TreeNode previousNode;  // A pointer to the previous node in the right-skewed tree
+
+    public TreeNode increasingBST(TreeNode root) {
+        newRoot = previousNode = null; 
+        inorderTraversal(root);  // Perform inorder traversal to build the right-skewed tree
+        return newRoot;  // Return the root of the newly constructed right-skewed tree
+    }
+
+    private void inorderTraversal(TreeNode currentNode) {
+        if (currentNode == null) {
+            return;  // Base case: if the node is null, do nothing
+        }
+
+        // Recursively traverse the left subtree
+        inorderTraversal(currentNode.left);
+
+        // Process the current node
+        if (newRoot == null) {
+            // The first node visited becomes the new root of the right-skewed tree
+            newRoot = currentNode;
+            previousNode = currentNode;
+        } else {
+            // Link the previous node to the current node on the right
+            previousNode.right = currentNode;
+            currentNode.left = null;  // Ensure the left child of the current node is null
+            previousNode = currentNode;  // Move the previous pointer forward
+        }
+
+        // Recursively traverse the right subtree
+        inorderTraversal(currentNode.right);
+    }
+}
