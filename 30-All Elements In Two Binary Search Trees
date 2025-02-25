@@ -1,0 +1,69 @@
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ * int val;
+ * TreeNode left;
+ * TreeNode right;
+ * TreeNode() {}
+ * TreeNode(int val) { this.val = val; }
+ * TreeNode(int val, TreeNode left, TreeNode right) {
+ * this.val = val;
+ * this.left = left;
+ * this.right = right;
+ * }
+ * }
+ */
+
+
+ //Bruteforce approach
+
+class Solution {
+    public List<Integer> getAllElements(TreeNode root1, TreeNode root2) {
+        List<Integer> inorderTraversal1 = new ArrayList<>();
+        List<Integer> inorderTraversal2 = new ArrayList<>();
+
+        // Step 1: Perform inorder traversal on both trees to get sorted lists
+        findInorderTraversal(root1, inorderTraversal1);
+        findInorderTraversal(root2, inorderTraversal2);
+
+        // Step 2: Merge the two sorted lists into one sorted list
+        return mergeTwoSortedLists(inorderTraversal1, inorderTraversal2);
+    }
+
+    private void findInorderTraversal(TreeNode root, List<Integer> inorderTraversal) {
+        if (root == null) {
+            return;
+        }
+
+        findInorderTraversal(root.left, inorderTraversal);
+        inorderTraversal.add(root.val);
+        findInorderTraversal(root.right, inorderTraversal);
+    }
+
+    private List<Integer> mergeTwoSortedLists(List<Integer> list1, List<Integer> list2) {
+        List<Integer> merged = new ArrayList<>();
+        int i = 0, j = 0;
+
+        while (i < list1.size() && j < list2.size()) {
+            if (list1.get(i) <= list2.get(j)) {
+                merged.add(list1.get(i++));
+            } else {
+                merged.add(list2.get(j++));
+            }
+        }
+
+        while (i < list1.size()) {
+            merged.add(list1.get(i++));
+        }
+
+        while (j < list2.size()) {
+            merged.add(list2.get(j++));
+        }
+
+        return merged;
+    }
+}
+
+
+//Optimal approach
+
