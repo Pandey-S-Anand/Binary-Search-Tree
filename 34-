@@ -1,0 +1,69 @@
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ * int val;
+ * TreeNode left;
+ * TreeNode right;
+ * TreeNode() {}
+ * TreeNode(int val) { this.val = val; }
+ * TreeNode(int val, TreeNode left, TreeNode right) {
+ * this.val = val;
+ * this.left = left;
+ * this.right = right;
+ * }
+ * }
+ */
+
+//Bruteforce approach
+ 
+class Solution {
+    public void recoverTree(TreeNode root) {
+        List<TreeNode> incorrectInorder = new ArrayList<>();
+
+        // Step 1: Get the inorder traversal of the tree (which will be incorrect)
+        performInorderTraversal(root, incorrectInorder);
+
+        // Step 2: Create a sorted version of the inorder traversal (correct order)
+        List<TreeNode> correctInorder = new ArrayList<>(incorrectInorder);
+        Collections.sort(correctInorder, (node1, node2) -> Integer.compare(node1.val, node2.val));
+
+        // Step 4: Locate the swapped nodes in the actual BST
+        TreeNode[] swappedNodes = findSwappedNodes(incorrectInorder, correctInorder);
+
+        // Step 5: Swap their values to recover the BST
+        int temp = swappedNodes[0].val;
+        swappedNodes[0].val = swappedNodes[1].val;
+        swappedNodes[1].val = temp;
+    }
+
+    private void performInorderTraversal(TreeNode root, List<TreeNode> inorderTraversal) {
+        if (root == null) {
+            return;
+        }
+        performInorderTraversal(root.left, inorderTraversal);
+        inorderTraversal.add(root);
+        performInorderTraversal(root.right, inorderTraversal);
+    }
+
+    private TreeNode[] findSwappedNodes(List<TreeNode> incorrect, List<TreeNode> correct) {
+        TreeNode[] swappedNodes = new TreeNode[2];
+        int i = 0, j = 0, index = 0;
+
+        // Compares incorrect inorder traversal with the correct inorder traversal to find the two swapped values.
+        while (i < incorrect.size() && j < correct.size()) {
+            if (incorrect.get(i).val != correct.get(j).val) {
+                swappedNodes[index++] = incorrect.get(i);
+                if (index == 2) {
+                    break;
+                }
+            }
+            i++;
+            j++;
+        }
+        return swappedNodes;
+    }
+}
+
+
+//Optimal approach
+
