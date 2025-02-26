@@ -90,3 +90,86 @@ class Solution {
 
 //Optimal approach
 
+// BSTIterator class for inorder or reverse inorder traversal
+class BSTIterator {
+    private Stack<TreeNode> stack; // Stack to store tree nodes
+    private boolean inorderReverse; // Flag to determine traversal order
+
+    // Constructor initializes the iterator
+    public BSTIterator(TreeNode root, boolean inorderReverse) {
+        stack = new Stack<>();
+        this.inorderReverse = inorderReverse;
+        pushNodes(root); // Initialize stack with the required traversal order
+    }
+
+    // Returns the next element in the inorder/reverse inorder traversal
+    public int next() {
+        TreeNode node = stack.pop(); // Get the top node
+        // If normal inorder (left-root-right), push right subtree nodes
+        if (!inorderReverse) {
+            pushNodes(node.right);
+        }else { // If reverse inorder (right-root-left), push left subtree nodes
+            pushNodes(node.left); 
+        }
+        return node.val;
+    }
+
+    // Checks if there are more nodes to process
+    public boolean hasNext() {
+        return !stack.isEmpty();
+    }
+
+    private void pushNodes(TreeNode node) {
+        if (!inorderReverse) { // Normal inorder (left-root-right)
+            while (node != null) {
+                stack.push(node);
+                node = node.left;
+            }
+        } else { // Reverse inorder (right-root-left)
+            while (node != null) {
+                stack.push(node);
+                node = node.right;
+            }
+        }
+    }
+}
+
+class Solution {
+    public boolean findTarget(TreeNode root, int k) {
+        /*
+         * This iterator-based approach is equivalent to using two pointers placed at the
+         * two extreme ends of a sorted list containing the inorder traversal of a BST.
+         * The 'inorder' iterator moves from left to right (ascending order),
+         * while the 'reverseInorder' iterator moves from right to left (descending order).
+         * This allows us to efficiently check for the target sum in O(N) time without
+         * explicitly storing the entire inorder traversal in a list.
+         */
+
+        // Iterator for normal inorder traversal (ascending order)
+        BSTIterator inorder = new BSTIterator(root, false);
+        // Iterator for reverse inorder traversal (descending order)
+        BSTIterator reverseInorder = new BSTIterator(root, true);
+
+        int low = inorder.next(); // Smallest element in BST
+        int high = reverseInorder.next(); // Largest element in BST
+
+        // Two-pointer approach using two iterators
+        while (low < high) {
+            int sum = low + high;
+            if (sum == k) { // If pair found, return true
+                return true;
+            }
+            /*
+             * If current sum is larger than target sum, move the right pointer (high) "left" logically (decreasing the value)
+             * (technically moving forward in reverse inorder, which is stored in descending order)
+             */
+            if (sum > k) {
+                high = reverseInorder.next();
+            } else { // If current sum is smaller than target sum, move the left pointer (low) "right" logically (increasing the value)
+                low = inorder.next();
+            }
+        }
+
+        return false; // If no pair found, return false
+    }
+}
