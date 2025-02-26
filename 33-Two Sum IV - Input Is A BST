@@ -1,0 +1,92 @@
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ * int val;
+ * TreeNode left;
+ * TreeNode right;
+ * TreeNode() {}
+ * TreeNode(int val) { this.val = val; }
+ * TreeNode(int val, TreeNode left, TreeNode right) {
+ * this.val = val;
+ * this.left = left;
+ * this.right = right;
+ * }
+ * }
+ */
+
+//Naive approach
+ 
+class Solution {
+    public boolean findTarget(TreeNode root, int k) {
+        List<Integer> inorderTraversal = new ArrayList<>();
+
+        // Perform inorder traversal to collect the values in sorted order
+        performInorderTraversal(root, inorderTraversal);
+
+        // Use the two-pointer technique on the sorted list to find if a pair exists
+        return existsTargetSumPair(inorderTraversal, k);
+    }
+
+    private void performInorderTraversal(TreeNode root, List<Integer> inorderTraversal) {
+        if (root == null) {
+            return;
+        }
+
+        performInorderTraversal(root.left, inorderTraversal);
+
+        inorderTraversal.add(root.val);
+
+        performInorderTraversal(root.right, inorderTraversal);
+    }
+
+    private boolean existsTargetSumPair(List<Integer> sortedList, int targetSum) {
+        int leftPointer = 0, rightPointer = sortedList.size() - 1;
+
+        while (leftPointer < rightPointer) {
+            int currentSum = sortedList.get(leftPointer) + sortedList.get(rightPointer);
+
+            if (currentSum == targetSum) {
+                return true; // Found a pair that sums up to targetSum
+            } else if (currentSum < targetSum) {
+                leftPointer++; // Move left pointer forward to increase the sum
+            } else {
+                rightPointer--; // Move right pointer backward to decrease the sum
+            }
+        }
+
+        return false; // No valid pair found
+    }
+}
+
+
+//Better approach
+
+class Solution {
+    private Set<Integer> visited;
+
+    public boolean findTarget(TreeNode root, int k) {
+        visited = new HashSet<>();
+        return existsTargetSumPair(root, k);
+    }
+
+    private boolean existsTargetSumPair(TreeNode root, int targetSum) {
+        if (root == null) {
+            return false; // Base case: if node is null, return false
+        }
+
+        // If complement (target - current value) exists in HashSet, return true
+        if (visited.contains(targetSum - root.val)) {
+            return true;
+        }
+
+        // Store the current node's value in the HashSet
+        visited.add(root.val);
+
+        // Recursively search in the left and right subtrees
+        return existsTargetSumPair(root.left, targetSum) || existsTargetSumPair(root.right, targetSum);
+    }
+}
+
+
+//Optimal approach
+
