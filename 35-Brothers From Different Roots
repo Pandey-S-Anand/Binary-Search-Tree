@@ -1,0 +1,46 @@
+class Solution {
+    public static int countPairs(Node root1, Node root2, int target) {
+        List<Integer> inorderTraversal1 = new ArrayList<>();
+        List<Integer> inorderTraversal2 = new ArrayList<>();
+
+        // Step 1: Get the inorder traversal of both BSTs (which gives sorted lists)
+        findInorderTraversal(root1, inorderTraversal1);
+        findInorderTraversal(root2, inorderTraversal2);
+
+        // Step 2: Use the two-pointer technique to count valid pairs that sum up to the target
+        return countTargetSumPairs(inorderTraversal1, inorderTraversal2, target);
+    }
+
+
+    private static void findInorderTraversal(Node root, List<Integer> inorderTraversal) {
+        if (root == null) {
+            return;
+        }
+        findInorderTraversal(root.left, inorderTraversal); 
+        inorderTraversal.add(root.data); 
+        findInorderTraversal(root.right, inorderTraversal);
+    }
+    
+
+    private static int countTargetSumPairs(List<Integer> list1, List<Integer> list2, int target) {
+        int count = 0;
+        int left = 0, right = list2.size() - 1;
+
+        // Two-pointer technique to find valid pairs
+        while (left < list1.size() && right >= 0) {
+            int sum = list1.get(left) + list2.get(right);
+            
+            if (sum == target) { // Found a valid pair
+                count++;  
+                left++;   // Move left pointer forward to check next possible pair
+                right--;  // Move right pointer backward to check next possible pair
+            } else if (sum < target) {
+                left++;   // Move left pointer forward to increase sum
+            } else {
+                right--;  // Move right pointer backward to decrease sum
+            }
+        }
+
+        return count;
+    }
+}
