@@ -67,3 +67,51 @@ class Solution {
 
 //Optimal approach
 
+/*
+ * Example:
+ * Correct inorder: [2, 3, 4, 5, 8, 10, 15, 18, 20, 25]
+ * Incorrect inorder: [2, 3, 4, 5, 15, 10, 8, 18, 20, 25]
+ */
+
+/*
+ * Example:
+ * correct inorder: [1, 2, 3, 4]
+ * InCorrect inorder: [1, 3, 2, 4] (not sorted)
+ */
+class Solution {
+    private TreeNode firstSwapped = null;
+    private TreeNode secondSwapped = null;
+    private TreeNode previousNode = null;
+
+    public void recoverTree(TreeNode root) {
+        // Step 1: Perform inorder traversal and detect swapped nodes
+        detectSwappedNodes(root);
+
+        // Step 2: Swap values of the incorrect nodes
+        int temp = firstSwapped.val;
+        firstSwapped.val = secondSwapped.val;
+        secondSwapped.val = temp;
+    }
+
+    private void detectSwappedNodes(TreeNode root) {
+        if (root == null) {
+            return;
+        }
+
+        // Recur for left subtree
+        detectSwappedNodes(root.left);
+
+        // Check if there is a misplaced node in inorder traversal
+        if (previousNode != null && previousNode.val > root.val) {
+            if (firstSwapped == null) {
+                firstSwapped = previousNode; // First misplaced node
+            }
+            secondSwapped = root; // Update second misplaced node
+        }
+
+        previousNode = root; // Move previous pointer forward
+
+        // Recur for right subtree
+        detectSwappedNodes(root.right);
+    }
+}
