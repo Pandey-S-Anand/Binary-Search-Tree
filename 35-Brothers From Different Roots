@@ -1,3 +1,5 @@
+//Naive approach
+
 class Solution {
     public static int countPairs(Node root1, Node root2, int target) {
         List<Integer> inorderTraversal1 = new ArrayList<>();
@@ -42,5 +44,68 @@ class Solution {
         }
 
         return count;
+    }
+}
+
+
+//Optimal approach
+
+class Solution {
+    public static int countPairs(Node root1, Node root2, int target) {
+        BstIterator inorder = new BstIterator(root1, false);
+        BstIterator reverseInorder = new BstIterator(root2, true);
+
+        // Step 2: Use iterators like two pointers
+        int count = 0;
+        Integer left = inorder.getNext(); // Smallest element from root1
+        Integer right = reverseInorder.getNext(); // Largest element from root2
+        // Step 3: Two-pointer approach
+        while (left != null && right != null) {
+            int sum = left + right;
+
+            if (sum == target) { // Found a valid pair
+                count++;
+                left = inorder.hasNext() ? inorder.getNext() : null;
+                right = reverseInorder.hasNext() ? reverseInorder.getNext() : null;
+            } else if (sum < target) {
+                left = inorder.hasNext() ? inorder.getNext() : null;
+            } else {
+                right = reverseInorder.hasNext() ? reverseInorder.getNext() : null;
+            }
+        }
+
+        return count;
+    }
+}
+
+class BstIterator {
+    private Deque<Node> stack;
+    private boolean reverseInorder;
+
+    BstIterator(Node root, boolean reverseInorder) {
+        stack = new ArrayDeque<>();
+        this.reverseInorder = reverseInorder;
+        pushNodes(root);
+    }
+
+    public boolean hasNext() {
+        return !stack.isEmpty();
+    }
+
+    public int getNext() {
+        Node node = stack.pop();
+        if (!reverseInorder) {
+            pushNodes(node.right);
+        } else {
+            pushNodes(node.left);
+        }
+        return node.data;
+    }
+
+    private void pushNodes(Node node) {
+        while (node != null) {
+            stack.push(node);
+            node = !reverseInorder ? node.left : node.right;
+        }
     }
 }
