@@ -3,54 +3,84 @@
 //Bruteforce approach
 
 class Solution {
-    public Node flattenBST(Node root) {
-        // Get the inorder traversal of the tree as a list of nodes
-        List<Node> inorderTraversal = getInorderTraversal(root);
+    private List<Node> inorderTraversal;
 
-        for (int i = 0; i < inorderTraversal.size() - 1; i++) {
+    public Node flattenBST(Node root) {
+        inorderTraversal = new ArrayList<>();
+        // Perform inorder traversal to get nodes in sorted order
+        getInorderTraversal(root);
+
+        Node prevNode = inorderTraversal.get(0);
+        // First node in the inorder traversal will always have it's left child as null
+
+        for (int i = 1; i < inorderTraversal.size(); i++) {
             Node currentNode = inorderTraversal.get(i);
-            Node nextNode = inorderTraversal.get(i + 1);
-            // Link current node's right to the next node in inorder sequence
-            currentNode.right = nextNode;
+            // Link previous node right to the next node in inorder sequence
+            prevNode.right = currentNode;
             // Set current node's left child to null as we are flattening into a linked list
             currentNode.left = null;
+            prevNode = currentNode;
         }
-        
-        // Set the left and right child of the last node to null
-        Node lastNode=inorderTraversal.get(inorderTraversal.size() - 1);
-        lastNode.left = null;
-        lastNode.right = null;
 
+        // Return the new root node of the flattened tree (first node in inorder traversal)
         return inorderTraversal.get(0);
     }
 
-    private List<Node> getInorderTraversal(Node root) {
-        List<Node> inorderTraversal = new ArrayList<>();
-        Node currentNode = root;
-
-        while (currentNode != null) {
-            if (currentNode.left == null) {
-                inorderTraversal.add(currentNode);
-                currentNode = currentNode.right;
-            } else {
-                Node rightmost = currentNode.left;
-
-                while (rightmost.right != null && rightmost.right != currentNode) {
-                    rightmost = rightmost.right;
-                }
-
-                if (rightmost.right == currentNode) {
-                    inorderTraversal.add(currentNode);
-                    rightmost.right = null;
-                    currentNode = currentNode.right;
-                } else {
-                    rightmost.right = currentNode;
-                    currentNode = currentNode.left;
-                }
-            }
+    private void getInorderTraversal(Node root) {
+        if (root == null) {
+            return;
         }
 
-        return inorderTraversal;
+        getInorderTraversal(root.left);
+        inorderTraversal.add(root);
+        getInorderTraversal(root.right);
+    }
+}
+
+
+//Better Approach
+
+class Solution {
+    // Pointer to keep track of the previous processed node in the inorder traversal
+    private Node prevNode;
+    
+    // Pointer to store the head (new root) of the flattened BST
+    private Node head;
+
+    public Node flattenBST(Node root) {
+        // Initialize pointers to null before starting the traversal
+        prevNode = head = null;
+        
+        // Perform inorder traversal and flatten the BST in place
+        getInorderTraversal(root);
+        
+        // Return the new root (head) of the flattened BST
+        return head;
+    }
+
+    private void getInorderTraversal(Node root) {
+        if (root == null) {
+            return;
+        }
+
+        // Recursively traverse the left subtree
+        getInorderTraversal(root.left);
+
+        // If this is the first node in the inorder sequence, set it as head
+        if (prevNode == null) {
+            head = root;
+        } else {
+            // Link the previous node's right pointer to the current node
+            prevNode.right = root;
+            // Since we're creating a singly linked list, set the left pointer to null
+            root.left = null;
+        }
+
+        // Update prevNode to the current node before moving to the right subtree
+        prevNode = root;
+
+        // Recursively traverse the right subtree
+        getInorderTraversal(root.right);
     }
 }
 
