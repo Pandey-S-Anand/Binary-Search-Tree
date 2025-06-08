@@ -84,43 +84,38 @@ class Solution {
         }
 
         /*
-         * Case 2: When only one recursive call returns a non-null value (i.e., either p or q),
-         * it indicates that one of the nodes (p or q) has been found in that subtree.
-         * We then propagate that non-null node upward to the parent call to continue
-         * the search for the LCA.
+         * As we are guaranteed that p and q exist, and a node can be a descendant of itself:
          *
-         * Suppose you are at a node N in the tree, and you find p in the left subtree
-         * of N. Then, q must be in one of three places:
+         * Case 2:
+         * Suppose we are at Node N and p is found in the left subtree of N (i.e., we received p),
+         * and q is not found in the right subtree (i.e., we received null).
+         * Then q would either be in the left or right subtree of p.
+         * In either case, p is the LCA. That's why we return the non-null value i.e., p here (LCA).
          *
-         * 1. In the right subtree of N:
-         * - If q is in the right subtree of N, then N is the lowest common ancestor (LCA)
-         *   of p and q. This is because N is the deepest node that has both p (in its left subtree)
-         *   and q (in its right subtree) as descendants.
-         *
-         * 2. Above N in the tree:
-         * - If q is not in the right subtree of N, it must be somewhere above N in the tree.
-         *   This means the LCA of p and q is an ancestor of N.
-         *
-         * 3. q is a descendant of p:
-         * - In this case, p itself is the LCA.
-         *   Since q is already a descendant of p, p will be the deepest node that has both p and q as descendants.
-         *
-         *   The LCA is the deepest node that has both p and q as descendants.
-         *
-         *   This is why the algorithm stops searching further down the branch once it
-         *   finds p or q and backtracks to find the LCA.
+         * Case 3:
+         * Suppose we are at Node N and q is found in the right subtree (we received q),
+         * and p is not found in the left subtree (i.e., we received null).
+         * Then p would either be in the left or right subtree of q.
+         * In either case, q is the LCA. That's why we return the non-null value i.e., q here (LCA).
          *
          * For example, consider the tree:
-         *    3
-         *   / \
-         *  5   1
-         * / \
-         * 6  2
-         *   / \
-         *  7   4
+         *           3
+         *         /   \
+         *        5     1
+         *       / \   / \
+         *      6   2 8   9
+         *         / \
+         *        7   4
          *
-         * In scenarios where one node is an ancestor of the other (e.g., p = 5 and q = 4),
-         * the non-null value that is propagated upward (node 5) correctly serves as the LCA.
+         * p = 5, q = 1       -> 3 is the LCA
+         * p = 7, q = 4       -> 2 is the LCA
+         * p = 5, q = 6       -> 5 is the LCA
+         * p = 5, q = 7       -> 5 is the LCA
+         * p = 8, q = 9       -> 1 is the LCA
+         * p = 1, q = 8       -> 1 is the LCA
+         * p = 1, q = 9       -> 1 is the LCA
+         * p = 3, q = 9       -> 3 is the LCA
+         * p = 3, q = 8       -> 3 is the LCA
          */
 
         if (left != null) {
@@ -131,10 +126,11 @@ class Solution {
             return right;
         }
 
-        // Case 3: If subtree neither contains p or q, return the null
+        // Case 4: If the subtree contains neither p nor q, return null (This should never happen here as we are guaranteed that p and q exist)
         return null;
     }
 }
+
 
 //Optimal approach (These approaches assume that both p and q are guaranteed to exist in the tree, as we are not explicitly checking for their presence.)
 
@@ -157,6 +153,7 @@ class Solution {
             return lowestCommonAncestor(root.right, p, q);
         }
 
+
         //If one node is on the left and the other is on the right, or one of them is the root, the current node is the LCA.
         return root;
     }
@@ -174,11 +171,11 @@ class Solution {
             } else if (p.val > root.val && q.val > root.val) {
                 // If both p and q have values greater than root, the LCA must be in the left subtree
                 root = root.right;
-            } else { 
+            } else {
                 // If one is smaller and the other is larger than root, or one of them is equal to root, this is the LCA
-                return root;
+                break;
             }
         }
-        return null; // Return null if no LCA is found, although this case is unlikely since p and q are guaranteed to exist in the tree and the tree is a valid BST.
+        return root;
     }
 }
