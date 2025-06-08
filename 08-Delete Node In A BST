@@ -52,8 +52,8 @@
  *           30      70
  *          /  \    /  \
  *        20   40  60   80
- *       /         / \
- *     10        55  65
+ *       /    /    / \
+ *     10    35   55  65
  *
  * In this example:
  * - If we delete the node with value 50 (which has two children), we have two choices:
@@ -62,7 +62,6 @@
  *
  * Both replacements ensure that properties of the BST retains its correct ordering and structure after deletion.
  */
-
 
 class Solution {
     public TreeNode deleteNode(TreeNode root, int key) {
@@ -74,7 +73,7 @@ class Solution {
         // If the key to be deleted is smaller than the root's value, then it lies in the left subtree.
         if (key < root.val) {
             root.left = deleteNode(root.left, key);
-        } else if (key > root.val) {  // If the key to be deleted is greater than the root's value, then it lies in the right subtree.
+        } else if (key > root.val) { // If the key to be deleted is greater than the root's value, then it lies in the right subtree.
             root.right = deleteNode(root.right, key);
         } else { // If key is same as root's value, then this is the node to be deleted.
             // Case 1: Node is a leaf (has no children).
@@ -97,6 +96,17 @@ class Solution {
             TreeNode inorderPredecessor = findInorderPredecessor(root.left);
             // Replace the value of the node to be deleted with the inorder predecessor's value.
             root.val = inorderPredecessor.val;
+            /*
+             * The inorder predecessor is the rightmost node in the left subtree,
+             * so it never has a right child.
+             * It can be:
+             * 1. A leaf node (no children).
+             * 2. A node with only a left child.
+             *
+             * We use recursion to delete it because:
+             * - It handles both cases safely.
+             * - It updates links correctly without extra parent tracking.
+             */
             // Recursively delete the inorder predecessor since its value is now copied.
             root.left = deleteNode(root.left, inorderPredecessor.val);
         }
@@ -109,57 +119,6 @@ class Solution {
         // Traverse to the rightmost node.
         while (node.right != null) {
             node = node.right;
-        }
-        return node;
-    }
-}
-
-
-//Aliter
-
-class Solution {
-    public TreeNode deleteNode(TreeNode root, int key) {
-        if (root == null) {
-            return null;
-        }
-
-        if (key < root.val) {
-            root.left = deleteNode(root.left, key);
-        } else if (key > root.val) { 
-            root.right = deleteNode(root.right, key);
-        } else { // If key is same as root's value, then this is the node to be deleted.
-            // Case 1: Node is a leaf (has no children).
-            if (root.left == null && root.right == null) {
-                return null;
-            }
-
-            // Case 2: Node has only one child.
-            // If the left child is null, return the right child.
-            if (root.left == null) {
-                return root.right;
-            }
-            // If the right child is null, return the left child.
-            if (root.right == null) {
-                return root.left;
-            }
-
-            // Case 3: Node has two children.
-            // Find the inorder successor (smallest node in the left subtree).
-            TreeNode inorderSuccessor = findInorderSuccessor(root.right);
-            // Replace the value of the node to be deleted with the inorder successor's value.
-            root.val = inorderSuccessor.val;
-            // Recursively delete the inorder successor's since its value is now copied.
-            root.right = deleteNode(root.right, inorderSuccessor.val);
-        }
-
-        // Return the (possibly updated) root pointer.
-        return root;
-    }
-
-    private TreeNode findInorderSuccessor(TreeNode node) {
-        // Traverse to the leftmost node.
-        while (node.left != null) {
-            node = node.left;
         }
         return node;
     }
