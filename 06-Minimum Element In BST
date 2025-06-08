@@ -1,58 +1,45 @@
-//Naive approach
+//Bruteforce approach
 
 class Solution {
-    // Variable to store the minimum value found in the tree
-    private int minimum;
-
+    /**
+     * Inorder traversal of a Binary Search Tree (BST) yields the elements in sorted order.
+     * This method returns the first element of that sorted list,
+     * which corresponds to the minimum value in the BST.
+     */
     int minValue(Node root) {
-        // Initialize minimum with - 1
-        minimum = -1; // Given constraint: 0 <= node->data <= 10^5
+        // Edge case: if the tree is empty, return -1 as an invalid indicator
+        if (root == null) {
+            return -1;
+        }
 
-        // Start the recursive traversal to find the minimum value
-        findMinValue(root);
+        // Step 1: Create a list to store the inorder traversal (sorted elements of BST)
+        List<Integer> inorder = new ArrayList<>();
 
-        return minimum;
+        // Step 2: Fill the list with inorder traversal of the BST
+        findInorderTraversal(root, inorder);
+
+        // Step 3: The first element in inorder traversal of a BST is the minimum value
+        return inorder.get(0);
     }
 
-    private void findMinValue(Node root) {
-        // Base case: If the node is null, return 
+    private void findInorderTraversal(Node root, List<Integer> inorder) {
         if (root == null) {
             return;
         }
 
-        // Update minimum if the current node's value is smaller
-        minimum = Math.min(minimum, root.data);
+        // Traverse left subtree
+        findInorderTraversal(root.left, inorder);
 
-        // Recursively check the left and right subtrees
-        findMinValue(root.left);
-        findMinValue(root.right);
+        // Visit current node
+        inorder.add(root.data);
+
+        // Traverse right subtree
+        findInorderTraversal(root.right, inorder);
     }
 }
 
 
 //Optimal approach
-
-//Recursive approach
-
-class Solution {
-    int minValue(Node root) {
-        // Base case: If root is null, return -1 (Invalid value)
-        if (root == null) {
-            return -1;
-        }
-
-        // If there's no left child, return the current node's value
-        if (root.left == null) {
-            return root.data;
-        }
-
-        // Recur for the left subtree to find the minimum value
-        return minValue(root.left);
-    }
-}
-
-
-//Iterative approach
 
 class Solution {
     int minValue(Node root) {
