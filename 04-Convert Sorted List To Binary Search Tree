@@ -24,90 +24,58 @@
  * }
  */
 
-//Bruteforce approach
-
 class Solution {
     public TreeNode sortedListToBST(ListNode head) {
-        List<Integer> arr = new ArrayList<>();
-        ListNode currentNode = head;
-
-        while (currentNode != null) {
-            arr.add(currentNode.val);
-            currentNode = currentNode.next;
-        }
-        
-        // Start the recursive function with the full range of the array
-        return sortedListToBST(arr, 0, arr.size() - 1);
-    }
-
-    private TreeNode sortedListToBST(List<Integer> arr, int low, int high) {
-        // Base case: If the low index exceeds the high index, return null (no node to create)
-        if (low > high) {
-            return null;
-        }
-
-        // Find the middle element to make it the root of the subtree
-        int mid = low + (high - low) / 2;
-        TreeNode node = new TreeNode(arr.get(mid)); // Create a new node with the middle element
-
-        // Recursively construct the left subtree using the left half of the list
-        node.left = sortedListToBST(arr, low, mid - 1);
-
-        // Recursively construct the right subtree using the right half of the list
-        node.right = sortedListToBST(arr, mid + 1, high);
-
-        // Return the root node of the subtree
-        return node;
-    }
-}
-
-
-//Optimal approach
-
-class Solution {
-    public TreeNode sortedListToBST(ListNode head) {
-        // Base case: if the list is empty, return null.
+        // Base case: if the list is empty, return null (no tree).
         if (head == null) {
             return null;
         }
 
-        // Base case: if there's only one element, it becomes a leaf node.
+        // Base case: if the list has only one node, it becomes a leaf node in BST.
         if (head.next == null) {
             return new TreeNode(head.val);
         }
 
-        // Split the list and extract the middle node.
-        ListNode midNode = splitAndExtractMiddle(head);
+        /*
+         * Step 1: Find the middle node of the list which will become the root of the BST.
+         * Also, split the list into two halves:
+         *   - Left half: from head up to (but not including) midNode
+         *   - Right half: from midNode.next onward
+         */
+        ListNode midNode = splitAndExtractMiddle(head); // middle node becomes the root
+        ListNode rightHalfHead = midNode.next; // save start of right half
+        midNode.next = null; // cut connection to split list
 
-        // Create a new tree node with the middle node's value.
+        // Step 2: Create the root TreeNode with middle value
         TreeNode root = new TreeNode(midNode.val);
 
-        // Recursively construct the left subtree using the left half of the list.
+        // Step 3: Recursively build the left subtree from left half of the list
         root.left = sortedListToBST(head);
 
-        // Recursively construct the right subtree using the right half of the list.
-        root.right = sortedListToBST(midNode.next);
+        // Step 4: Recursively build the right subtree from right half of the list
+        root.right = sortedListToBST(rightHalfHead);
 
         return root;
     }
 
     private ListNode splitAndExtractMiddle(ListNode head) {
-        ListNode preMiddle = null; // Pointer to track the node before the middle.
-        ListNode slow = head;
-        ListNode fast = head;      
+        ListNode slow = head; // will point to middle node
+        ListNode fast = head; // moves twice as fast as slow
+        ListNode slowPrev = null; // node before slow (used to split the list)
 
+        // Traverse the list to find the middle node
         while (fast != null && fast.next != null) {
-            preMiddle = slow;
+            slowPrev = slow;
             slow = slow.next;
             fast = fast.next.next;
         }
 
         /*
-         * Detach the left half of the list from the middle node.
-         * Since this method is only called for lists with at least two nodes, preMiddle
-         * is not null.
+         * Disconnect the left half of the list from the middle node.
+         * After this, 'head' to 'slowPrev' is one half,
+         * and 'slow' to end is the other half.
          */
-        preMiddle.next = null;
+        slowPrev.next = null;
 
         return slow;
     }
