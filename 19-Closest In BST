@@ -2,9 +2,9 @@
 
 class Solution {
     // Variable to store the minimum absolute difference
-    private static int minAbsDiff;
+    private int minAbsDiff;
 
-    static int minDiff(Node root, int k) {
+    int minDiff(Node root, int k) {
         // Initialize minAbsDiff to the largest possible integer value
         minAbsDiff = Integer.MAX_VALUE;
 
@@ -15,7 +15,7 @@ class Solution {
         return minAbsDiff;
     }
 
-    private static void updateMinAbsDiff(Node node, int k) {
+    private void updateMinAbsDiff(Node node, int k) {
         // Base case: If the current node is null, return
         if (node == null) {
             return;
@@ -36,9 +36,9 @@ class Solution {
 //Optimal approach
 
 class Solution {
-    private static int minAbsDiff; 
+    private int minAbsDiff; 
     
-    static int minDiff(Node root, int k) { 
+    int minDiff(Node root, int k) { 
         // Initialize minAbsDiff with maximum possible value
         minAbsDiff = Integer.MAX_VALUE; 
         
@@ -49,14 +49,14 @@ class Solution {
         return minAbsDiff;
     } 
     
-    private static void findMinAbsdiff(Node root, int k) {
+    private void findMinAbsdiff(Node root, int k) {
         // Base case: If the node is null, return
         if (root == null) {
             return; 
         }
 
         // Update minAbsDiff with the absolute difference of the current node
-        minAbsDiff = Math.min(minAbsDiff, Math.abs(root.data - k));   
+        minAbsDiff = Math.min(minAbsDiff, Math.abs(k - root.data));   
         
         // If k is smaller than root.data, we need a smaller value to get closer to k, so we move to the left subtree.
         if (k < root.data) {
