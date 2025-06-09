@@ -1,67 +1,89 @@
+// your task is to complete the below function
 class GfG {
-    public static Node changeKey(Node root, int oldKey, int newKey) {
+    public Node changeKey(Node root, int oldKey, int newKey) {
         // Delete the node with the old key
-        root = deleteKey(root, oldKey);
+        root = deleteNode(root, oldKey);
         // Insert a new node with the new key
-        root = insertKey(root, newKey);
+        root = insertIntoBST(root, newKey);
         return root;
     }
 
-    private static Node deleteKey(Node root, int key) {
+    private Node deleteNode(Node root, int key) {
+        // Base case: If the tree is empty, just return null.
         if (root == null) {
             return null;
         }
 
-        // Traverse the tree to find the node to delete
+        // If the key to be deleted is smaller than the root's value, then it lies in the left subtree.
         if (key < root.data) {
-            root.left = deleteKey(root.left, key);
-        } else if (key > root.data) {
-            root.right = deleteKey(root.right, key);
-        } else {
-            // Node to be deleted found
-
-            // Case 1: Node has no children (leaf node)
+            root.left = deleteNode(root.left, key);
+        } else if (key > root.data) { // If the key to be deleted is greater than the root's value, then it lies in the right subtree.
+            root.right = deleteNode(root.right, key);
+        } else { // If key is same as root's value, then this is the node to be deleted.
+            // Case 1: Node is a leaf (has no children).
             if (root.left == null && root.right == null) {
                 return null;
             }
 
-            // Case 2: Node has only one child
+            // Case 2: Node has only one child.
+            // If the left child is null, return the right child.
             if (root.left == null) {
                 return root.right;
             }
+            // If the right child is null, return the left child.
             if (root.right == null) {
                 return root.left;
             }
 
-            // Case 3: Node has two children
-            // Find the inorder predecessor (maximum value in the left subtree)
-            Node inorderPredecessor = findInorderPredecessor(root);
-            // Replace the node's data with the inorder predecessor's data
+            // Case 3: Node has two children.
+            // Find the inorder predecessor (largest node in the left subtree).
+            Node inorderPredecessor = findInorderPredecessor(root.left);
+            // Replace the value of the node to be deleted with the inorder predecessor's value.
             root.data = inorderPredecessor.data;
-            // Delete the inorder predecessor node
-            root.left = deleteKey(root.left, inorderPredecessor.data);
+            /*
+             * The inorder predecessor is the rightmost node in the left subtree,
+             * so it never has a right child.
+             * It can be:
+             * 1. A leaf node (no children).
+             * 2. A node with only a left child.
+             *
+             * We use recursion to delete it because:
+             * - It handles both cases safely.
+             * - It updates links correctly without extra parent tracking.
+             */
+            // Recursively delete the inorder predecessor since its value is now copied.
+            root.left = deleteNode(root.left, inorderPredecessor.data);
         }
+
+        // Return the (possibly updated) root pointer.
         return root;
     }
 
-    private static Node findInorderPredecessor(Node root) {
-        Node node = root.left;
+    private Node findInorderPredecessor(Node node) {
+        // Traverse to the rightmost node.
         while (node.right != null) {
             node = node.right;
         }
         return node;
     }
 
-    private static Node insertKey(Node root, int key) {
+    private Node insertIntoBST(Node root, int target) {
+        // Base case: If the tree is empty, create a new node with the target value.
         if (root == null) {
-            return new Node(key);
+            return new Node(target);
         }
-        if (key < root.data) {
-            root.left = insertKey(root.left, key);
-        } else if (key > root.data) {
-            root.right = insertKey(root.right, key);
+
+        // If the target value is smaller, recurse into the left subtree.
+        if (target < root.data) {
+            root.left = insertIntoBST(root.left, target);
         }
-        // If key == root.data, do not insert duplicates
+
+        // If the target value is greater, recurse into the right subtree.
+        if (target > root.data) {
+            root.right = insertIntoBST(root.right, target);
+        }
+
+        // Return the original root node (unchanged except for the insertion).
         return root;
     }
 }
