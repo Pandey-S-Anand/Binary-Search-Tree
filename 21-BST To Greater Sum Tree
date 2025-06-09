@@ -1,14 +1,64 @@
-/**
- * Recursively performs a reverse in-order traversal (right, node, left) of the BST.
- * As nodes are visited in descending order, we update each node's value with the
- * accumulated sum of all nodes that have been processed (which are all greater than the current node).
- */
- 
+//Naive approach
+
+class Solution {
+    // Variable to store the cumulative sum of all nodes in the BST
+    private int sum;
+
+    public void transformTree(Node root) {
+        // Step 1: Find the total sum of all nodes in the original BST
+        sum = findBSTSum(root);
+
+        // Step 2: Traverse the tree and modify each node using the sum
+        transformToGreaterTree(root);
+    }
+
+    private int findBSTSum(Node root) {
+        if (root == null) {
+            return 0;
+        }
+
+        int leftSum = findBSTSum(root.left);   // Sum of left subtree
+        int rightSum = findBSTSum(root.right); // Sum of right subtree
+
+        return root.data + leftSum + rightSum; // Total sum for this subtree
+    }
+
+    /**
+     * We do an **in-order traversal (left → node → right)**, but modify
+     * each node's value by subtracting its current value from the running total `sum`,
+     * which initially holds the total of all nodes in the BST.
+     *
+     * At each node:
+     *  - Subtract the node's original value from the running total.
+     *  - Update the node's value to the new sum (which now represents the sum of all greater nodes).
+     */
+    private void transformToGreaterTree(Node root) {
+        if (root == null) {
+            return;
+        }
+
+        // Recursively process the left subtree first (in-order traversal)
+        transformToGreaterTree(root.left);
+
+        // Update the running sum by excluding the current node's original value
+        sum -= root.data;
+
+        // Set the current node's data to the updated sum
+        root.data = sum;
+
+        // Recursively process the right subtree
+        transformToGreaterTree(root.right);
+    }
+}
+
+
+//Optimal approach
+
 class Solution {
     // Global variable to keep track of the accumulated sum of nodes (with values greater than the current node).
-    private static int sum = 0;
+    private int sum = 0;
 
-    public static Node transformTree(Node root) {
+    public Node transformTree(Node root) {
         // Reset the sum before starting the transformation.
         sum = 0;
         // Start the reverse in-order traversal to update each node.
@@ -16,7 +66,7 @@ class Solution {
         return root;
     }
 
-    private static void convertBST(Node node) {
+    private void convertBST(Node node) {
         if (node == null) {
             return;
         }
