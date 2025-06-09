@@ -17,79 +17,89 @@
 //Naive approach
 
 class Solution {
-    private int totalSum; // Variable to store the total sum of all nodes
-    private List<TreeNode> inorderTraversal; // List to store nodes in inorder sequence
+    // Variable to store the cumulative sum of all nodes in the BST
+    private int sum;
 
     public TreeNode bstToGst(TreeNode root) {
-        inorderTraversal = new ArrayList<>();
-        totalSum = 0;
+        // Step 1: Find the total sum of all nodes in the original BST
+        sum = findBSTSum(root);
 
-        // Step 1: Perform inorder traversal and compute the total sum of all nodes
-        findInorderTraversal(root);
-
-        // Step 2: Modify the BST using the inorder list
-        for (TreeNode node : inorderTraversal) {
-            totalSum -= node.val; // Subtract the current node's value from the total sum
-            node.val += totalSum; // Update node's value with the sum of all greater nodes + original node value
-        }
-
-        return root; // Return the modified root
+        // Step 2: Traverse the tree and modify each node using the sum
+        transformToGreaterSumTree(root);
+        return root;
     }
 
-    private void findInorderTraversal(TreeNode root) {
+    private int findBSTSum(TreeNode root) {
+        if (root == null) {
+            return 0;
+        }
+
+        int leftSum = findBSTSum(root.left); // Sum of left subtree
+        int rightSum = findBSTSum(root.right); // Sum of right subtree
+
+        return root.val + leftSum + rightSum; // Total sum for this subtree
+    }
+
+    /**
+     * We do an **in-order traversal (left → node → right)**, but modify
+     * each node's value by subtracting its current value from the running total `sum`,
+     * which initially holds the total of all nodes in the BST.
+     *
+     * At each node:
+     *  - Subtract the node's original value from the running total.
+     *  - Update the node's value to the updated sum + its original value.
+     *  - The updated value now reflects "original node value + sum of greater nodes".
+     */
+    private void transformToGreaterSumTree(TreeNode root) {
         if (root == null) {
             return;
         }
 
-        // Traverse left subtree
-        findInorderTraversal(root.left);
+        // Recursively process the left subtree first (in-order traversal)
+        transformToGreaterSumTree(root.left);
 
-        // Store the current node and update the sum
-        inorderTraversal.add(root);
-        totalSum += root.val;
+        // Update the running sum by excluding the current node's original value
+        sum -= root.val;
 
-        // Traverse right subtree
-        findInorderTraversal(root.right);
+        //Update node value with sum of all greater values
+        root.val += sum;
+
+        // Recursively process the right subtree
+        transformToGreaterSumTree(root.right);
     }
 }
 
 
-
 //Optimal approach
 
-
 class Solution {
-    private int sum; // Global variable to keep track of the running sum of greater values
+    // Holds the running total of all node values processed so far (which are greater than the nodes yet to be visited in reverse in-order).
+    private int sum;
 
     public TreeNode bstToGst(TreeNode root) {
-        sum = 0; // Initialize sum to 0 before starting the transformation
-        bstToGstHelper(root); // Start the modification process
-        return root; // Return the modified BST root
+        // Initialize the accumulator before traversal.
+        sum = 0;
+        // Perform reverse in-order traversal: right → node → left
+        bstToGstHelper(root);
+        return root;
     }
 
-     /**
-     * Recursively performs a reverse in-order traversal (right, node, left) of the BST.
-     * As nodes are visited in descending order, we update each node's value with
-     * the accumulated sum of all nodes that have been processed (which are all greater than the current node) plus its original value.
-     */
-    private void bstToGstHelper(TreeNode root) {
-        if (root == null) {
-            return; // Base case: If the node is null, return immediately
+    private void bstToGstHelper(TreeNode node) {
+        if (node == null) {
+            // Base case: no node to process
+            return;
         }
 
-        // Process the right subtree first (greater values in BST)
-        bstToGstHelper(root.right);
+        // 1. Process right subtree first (all values > current node)
+        bstToGstHelper(node.right);
 
-        // Store the original value before modification
-        int originalValue = root.val;
+        // 2. At this point, 'sum' holds the total of all original values > node.val so we add it to the current node's value.
+        node.val += sum;
 
-        // Update the current node by adding the sum of all greater nodes
-        root.val += sum;
+        // 3. Include this node's original value into 'sum' for subsequent (left subtree) nodes.
+        sum = node.val;
 
-        // Update the running sum to include the current node's original value
-        sum += originalValue;
-
-        // Process the left subtree (smaller values in BST)
-        bstToGstHelper(root.left);
+        // 4. Process left subtree (values < current node)
+        bstToGstHelper(node.left);
     }
 }
