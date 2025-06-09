@@ -18,39 +18,118 @@
 
 class Solution {
     public TreeNode bstFromPreorder(int[] preorder) {
-        // Start the recursive construction of the tree, from the entire array (0 to preorder.length - 1)
-        return bstFromPreorder(preorder, 0, preorder.length - 1);
+        // Start building the BST from the full range of the preorder array
+        return constructBST(preorder, 0, preorder.length - 1);
     }
 
-    // Helper function to recursively build the BST
-    private TreeNode bstFromPreorder(int[] preorder, int low, int high) {
-        // Base case: If low index exceeds high index, the subtree is empty
+    private TreeNode constructBST(int[] preorder, int low, int high) {
+        // Base case: No elements in this range
         if (low > high) {
             return null;
         }
 
-        // The first element in the preorder array (preorder[low]) is the root of the tree/subtree
+        // The first element in this range is the root of the current subtree
         TreeNode root = new TreeNode(preorder[low]);
 
-        // Find the first element that is greater than the root (preorder[low]) to split the array into left and right subtrees
-        int index = low + 1;
-        while (index < preorder.length && preorder[index] < preorder[low]) {
-            index++;
+        // Find the index where elements become greater than root.val, i.e., beginning of the right subtree
+        int rightSubtreeStart = low + 1;
+        while (rightSubtreeStart <= high && preorder[rightSubtreeStart] < preorder[low]) {
+            rightSubtreeStart++;
         }
 
-        // Recursively build the left subtree with elements that are less than the root
-        root.left = bstFromPreorder(preorder, low + 1, index - 1);
-        
-        // Recursively build the right subtree with elements that are greater than the root
-        root.right = bstFromPreorder(preorder, index, high);
+        // Recursively construct the left and right subtrees
+        root.left = constructBST(preorder, low + 1, rightSubtreeStart - 1);
+        root.right = constructBST(preorder, rightSubtreeStart, high);
 
-        // Return the constructed subtree rooted at 'root'
         return root;
     }
 }
 
 
+
 // Optimal approach
+
+/*
+Dry Run: preorder = [8, 5, 1, 7, 10, 12]
+
+Initial call:
+    index = 0
+    Call bstFromPreorder(preorder, Integer.MIN_VALUE, Integer.MAX_VALUE)
+
+Step 1:
+    preorder[index] = 8 is in range (-∞, ∞) ✅
+    Create TreeNode(8), increment index -> index = 1
+
+    Left Subtree of 8:
+    Call bstFromPreorder(preorder, -∞, 8)
+
+Step 2:
+    preorder[index] = 5 is in range (-∞, 8) ✅
+    Create TreeNode(5), increment index -> index = 2
+
+    Left Subtree of 5:
+    Call bstFromPreorder(preorder, -∞, 5)
+
+Step 3:
+    preorder[index] = 1 is in range (-∞, 5) ✅
+    Create TreeNode(1), increment index -> index = 3
+
+    Left Subtree of 1:
+    Call bstFromPreorder(preorder, -∞, 1)
+        preorder[3] = 7 ❌ not in range (-∞, 1) → return null
+
+    Right Subtree of 1:
+    Call bstFromPreorder(preorder, 1, 5)
+        preorder[3] = 7 ❌ not in range (1, 5) → return null
+
+    TreeNode(1) has left = null, right = null
+
+Step 4:
+    Right Subtree of 5:
+    Call bstFromPreorder(preorder, 5, 8)
+        preorder[3] = 7 is in range (5, 8) ✅
+        Create TreeNode(7), increment index -> index = 4
+
+        Left Subtree of 7:
+        Call bstFromPreorder(preorder, 5, 7)
+            preorder[4] = 10 ❌ not in range (5, 7) → return null
+
+        Right Subtree of 7:
+        Call bstFromPreorder(preorder, 7, 8)
+            preorder[4] = 10 ❌ not in range (7, 8) → return null
+
+        TreeNode(7) has left = null, right = null
+
+    TreeNode(5) has left = TreeNode(1), right = TreeNode(7)
+
+Step 5:
+    Right Subtree of 8:
+    Call bstFromPreorder(preorder, 8, ∞)
+        preorder[4] = 10 is in range (8, ∞) ✅
+        Create TreeNode(10), increment index -> index = 5
+
+        Left Subtree of 10:
+        Call bstFromPreorder(preorder, 8, 10)
+            preorder[5] = 12 ❌ not in range (8, 10) → return null
+
+        Right Subtree of 10:
+        Call bstFromPreorder(preorder, 10, ∞)
+            preorder[5] = 12 is in range (10, ∞) ✅
+            Create TreeNode(12), increment index -> index = 6
+
+            Left & Right of 12:
+            preorder is fully consumed (index == preorder.length) → both return null
+
+        TreeNode(10) has left = null, right = TreeNode(12)
+
+Final Tree:
+
+            8
+           / \
+         5    10
+        / \     \
+       1   7     12
+*/
 
 class Solution {
     // Index to track the current position in the preorder array
@@ -63,7 +142,7 @@ class Solution {
 
     private TreeNode bstFromPreorder(int[] preorder, int min, int max) {
         // Base case: If all elements are processed or the current value is out of range, return null
-        if (index == preorder.length || preorder[index] < min || preorder[index] > max) {
+        if (index == preorder.length || !(preorder[index] > min && preorder[index] < max)) {
             return null;
         }
 
