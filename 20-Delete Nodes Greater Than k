@@ -1,5 +1,30 @@
-class Solution {
-    public static Node deleteNode(Node root, int k) {
+    /*
+    * Let's consider the BST:
+    *
+    *           10
+    *         /    \
+    *        5      15
+    *       / \     / \
+    *      3   7   13  18
+    *
+    * And let's say k = 13.
+    * So, we want to delete all nodes with values greater than or equal to 13.
+    *
+    * After applying the deletion:
+    * - Nodes 13, 15, and 18 should be removed.
+    * - The resulting tree would be:
+    *
+    *           10
+    *         /
+    *        5
+    *       / \
+    *      3   7
+    *
+    * In-order traversal before deletion: 3 5 7 10 13 15 18
+    * In-order traversal after deletion:  3 5 7 10
+    */
+
+    public Node deleteNode(Node root, int k) {
         // Base case: If the tree is empty, return null.
         if (root == null) {
             return null;
@@ -12,15 +37,17 @@ class Solution {
          * Therefore, discard the current node and continue processing only the left subtree.
          */
         if (root.data >= k) {
-            return deleteNode(root.left, k);
+            root = deleteNode(root.left, k);
+        } else {
+            /*
+             * If the current node's value is less than k, it is valid.
+             * By BST properties, all nodes in its left subtree are also < k.
+             * However, its right subtree might contain nodes with values >= k that need to be removed.
+             * Recursively process the right subtree and attach the pruned subtree back to root.right.
+             */
+            root.right = deleteNode(root.right, k);
         }
-        /*
-         * If the current node's value is less than k, it is valid.
-         * By BST properties, all nodes in its left subtree are also < k.
-         * However, its right subtree might contain nodes with values >= k that need to be removed.
-         * Recursively process the right subtree and attach the pruned subtree back to root.right.
-         */
-        root.right = deleteNode(root.right, k);
+
         return root;
     }
 }
