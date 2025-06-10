@@ -6,20 +6,13 @@ class Solution {
         }
 
         /*
-         * If the current node's value falls within the range [low, high]
-         * Count this node and recursively check both left and right subtrees
-         */
-        if (root.data >= low && root.data <= high) {
-            return 1 + getCount(root.left, low, high) + getCount(root.right, low, high);
-        }
-
-        /*
          * If the current node's value is less than 'low',
          * then all nodes in its left subtree will also be less than 'low'.
          * So, we discard the left subtree and only check the right subtree.
          */
         if (root.data < low) {
-            return getCount(root.right, low, high);
+            root = root.right;
+            return getCount(root, low, high);
         }
 
         /*
@@ -27,6 +20,15 @@ class Solution {
          * then all nodes in its right subtree will also be greater than 'high'.
          * So, we discard the right subtree and only check the left subtree.
          */
-        return getCount(root.left, low, high);
+        if (root.data > high) {
+            root = root.left;
+            return getCount(root, low, high);
+        }
+        
+        /*
+         * If the current node's value falls within the range [low, high] (root.data >= low && root.data <= high)
+         * Count this node and recursively check both left and right subtrees
+         */
+        return 1 + getCount(root.left, low, high) + getCount(root.right, low, high);
     }
 }
