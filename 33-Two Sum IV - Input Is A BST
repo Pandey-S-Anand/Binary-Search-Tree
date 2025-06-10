@@ -59,35 +59,6 @@ class Solution {
 }
 
 
-//Better approach
-
-class Solution {
-    private Set<Integer> visited;
-
-    public boolean findTarget(TreeNode root, int k) {
-        visited = new HashSet<>();
-        return existsTargetSumPair(root, k);
-    }
-
-    private boolean existsTargetSumPair(TreeNode root, int targetSum) {
-        if (root == null) {
-            return false; // Base case: if node is null, return false
-        }
-
-        // If complement (target - current value) exists in HashSet, return true
-        if (visited.contains(targetSum - root.val)) {
-            return true;
-        }
-
-        // Store the current node's value in the HashSet
-        visited.add(root.val);
-
-        // Recursively search in the left and right subtrees
-        return existsTargetSumPair(root.left, targetSum) || existsTargetSumPair(root.right, targetSum);
-    }
-}
-
-
 //Optimal approach
 
 // BSTIterator class for inorder or reverse inorder traversal
