@@ -16,17 +16,9 @@
 
 class Solution {
     public int rangeSumBST(TreeNode root, int low, int high) {
-         // Base case: If the tree is empty, return 0
+        // Base case: If the tree is empty, return 0
         if (root == null) {
             return 0;
-        }
-
-        /*
-         * If the current node's value falls within the range [low, high]
-         * Add this node value to the sum and recursively process both left and right subtrees
-         */
-        if (root.val >= low && root.val <= high) {
-            return root.val + rangeSumBST(root.left, low, high) + rangeSumBST(root.right, low, high);
         }
 
         /*
@@ -35,7 +27,8 @@ class Solution {
          * So, we discard the left subtree and only check the right subtree.
          */
         if (root.val < low) {
-            return rangeSumBST(root.right, low, high);
+            root = root.right;
+            return rangeSumBST(root, low, high);
         }
 
         /*
@@ -43,6 +36,15 @@ class Solution {
          * then all nodes in its right subtree will also be greater than 'high'.
          * So, we discard the right subtree and only check the left subtree.
          */
-        return rangeSumBST(root.left, low, high);
+        if (root.val > high) {
+            root = root.left;
+            return rangeSumBST(root, low, high);
+        }
+
+        /*
+        * If the current node's value falls within the range [low, high] (root.val >= low && root.val <= high)
+        * Add this node value to the sum and recursively process both left and right subtrees
+        */
+        return root.val + rangeSumBST(root.left, low, high) + rangeSumBST(root.right, low, high);
     }
 }
