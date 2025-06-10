@@ -29,8 +29,8 @@ class Solution {
          * the right subtree.
          */
         if (root.val < low) {
-            root = trimBST(root.right, low, high);
-            return root;
+            root = root.right;
+            return trimBST(root, low, high);
         }
 
         /*
@@ -40,8 +40,8 @@ class Solution {
          * the left subtree.
          */
         if (root.val > high) {
-            root = trimBST(root.left, low, high);
-            return root;
+            root = root.left;
+            return trimBST(root, low, high);
         }
 
         // If the current node's value is within the valid range [low, high], we need to recursively trim both its left and right subtrees.
