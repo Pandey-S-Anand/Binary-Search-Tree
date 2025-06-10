@@ -14,6 +14,7 @@
  * }
  */
  
+
 class Solution {
     public TreeNode trimBST(TreeNode root, int low, int high) {
         // Base case: If the current node is null, there's nothing to trim, so return null.
@@ -28,7 +29,8 @@ class Solution {
          * the right subtree.
          */
         if (root.val < low) {
-            return trimBST(root.right, low, high);
+            root = trimBST(root.right, low, high);
+            return root;
         }
 
         /*
@@ -38,7 +40,8 @@ class Solution {
          * the left subtree.
          */
         if (root.val > high) {
-            return trimBST(root.left, low, high);
+            root = trimBST(root.left, low, high);
+            return root;
         }
 
         // If the current node's value is within the valid range [low, high], we need to recursively trim both its left and right subtrees.
