@@ -88,45 +88,58 @@ class Solution {
 //Optimal approach
 
 class Solution {
-    private Node head = null; // Pointer to the head of the flattened tree (new root)
-    private Node tail = null; // Pointer to keep track of the last node in the flattened tree
+    // Helper class to manage building the flattened BST
+    private static class NodeBuilder {
+        private Node head; // Head of the flattened linked list (i.e., new root of the BST)
+        private Node tail; // Tail of the currently built list
+
+        // Append a node to the end of the flattened tree
+        private void append(Node node) {
+            if (head == null) {
+                // First node to be added; initialize head and tail
+                head = tail = node;
+            } else {
+                // Append the node to the right of the current tail
+                tail.right = node;
+                tail.left = null; // Set left to null to satisfy singly linked list
+                tail = node;      // Update tail to new node
+            }
+        }
+    }
 
     public Node flattenBST(Node root) {
+        NodeBuilder nodeBuilder = new NodeBuilder();  // To keep track of flattened list
         Node currentNode = root;
 
         while (currentNode != null) {
             if (currentNode.left == null) {
-                // If there is no left child, append the current node to the flattened tree
-                append(currentNode);
-                currentNode = currentNode.right; // Move to the right child
+                // No left child → visit current node and move right
+                nodeBuilder.append(currentNode);     // Add node to flattened list
+                currentNode = currentNode.right;     // Move to right child
             } else {
-                // Find the rightmost node of the left subtree
+                // Node has a left child → find in-order predecessor (rightmost of left subtree)
                 Node rightMostNode = currentNode.left;
                 while (rightMostNode.right != null) {
                     rightMostNode = rightMostNode.right;
                 }
 
-                // Connect the rightmost node of the left subtree to the current node
+                /*
+                 * Create a thread to current node:
+                 * Make the rightmost node's right point to current node
+                 */
                 rightMostNode.right = currentNode;
 
-                // Move current pointer to the left child and nullify the left pointer
+                /*
+                 * Move current pointer to the left child
+                 * Also break the left link to avoid cycles and preserve singly linked structure
+                 */
                 Node temp = currentNode;
                 currentNode = currentNode.left;
                 temp.left = null;
             }
         }
 
-        return head; // Return the new root of the flattened tree (smallest node)
-    }
-
-    private void append(Node node) {
-        if (head == null) {
-            // If this is the first node being added, initialize head and tail
-            head = tail = node;
-        } else {
-            // Link the current node to the flattened list and update tail
-            tail.right = node;
-            tail = node;
-        }
+        // Return the head of the flattened tree (new BST root)
+        return nodeBuilder.head;
     }
 }
