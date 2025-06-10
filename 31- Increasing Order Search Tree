@@ -42,7 +42,7 @@ class Solution {
         }
 
         // Return the root of the new right-skewed BST (the first node in inorder traversal)
-        return previousNode;
+        return inorderNodes.get(0);
     }
 
     private void performInorderTraversal(TreeNode root) {
